@@ -1,297 +1,284 @@
-/* Colores de la paleta (inspirados en el logo) */
 :root {
-    --primary-dark: #1b1b1b; /* Fondo principal */
-    --secondary-green: #2e4d2c; /* Fondo de contenedores, elementos clave */
-    --accent-green-light: #4CAF50; /* Acentos, botones, títulos */
-    --text-light: #e0ffe0; /* Texto general claro */
-    --border-light-green: #88ff88; /* Borde de inputs */
-    --button-hover: #45a049; /* Hover de botón */
-    --delete-button-bg: #d9534f; /* Botón de eliminar */
-    --delete-button-hover: #c9302c; /* Hover de botón de eliminar */
-    --table-header-bg: #3a5a3a; /* Fondo de cabecera de tabla */
+    /* Colores inspirados en el logo MTK - tonos dorados/bronce y oscuros */
+    --gold-primary: #DAA520; /* Dorado fuerte */
+    --gold-accent: #FFD700; /* Oro para acentos y luces */
+    --dark-metal: #2F4F4F; /* Gris oscuro metálico / Verde oscuro azulado */
+    --dark-background: #1A1A1A; /* Negro muy oscuro para fondo principal */
+    --light-text-gold: #F0E68C; /* Dorado claro para texto sobre fondos oscuros */
+    --medium-grey-border: #555; /* Gris medio para bordes sutiles */
+    --button-bg: #4B4B4B; /* Gris oscuro para botones */
+    --button-hover: #606060; /* Gris más claro para hover de botones */
+    --error-red: #D32F2F; /* Rojo para mensajes de error */
+    --black-text: #000000; /* Negro para texto sobre elementos claros */
+    --table-header-bg: #3A3A3A; /* Fondo para encabezados de tabla */
+    --white-text: #FFFFFF; /* Texto blanco para mayor contraste */
+
+    /* Nuevos colores para el botón de cliente */
+    --client-new-btn: #E53935; /* Rojo para cliente nuevo */
+    --client-new-btn-hover: #C62828;
+    --client-existing-btn: #4CAF50; /* Verde para cliente existente */
+    --client-existing-btn-hover: #43A047;
+
+    /* Color para el botón de descarga de PDF */
+    --pdf-download-btn: #007BFF; /* Azul brillante */
+    --pdf-download-btn-hover: #0056b3; /* Azul más oscuro al pasar el ratón */
 }
 
+/* Fondo general del body */
 body {
     font-family: Arial, sans-serif;
-    background: var(--primary-dark);
-    color: var(--text-light);
+    margin: 0;
     padding: 0;
-    margin: 0;
-    line-height: 1.6;
-    min-height: 100vh;
+    background-color: var(--dark-background);
+    color: var(--light-text-gold);
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start; /* Alinea al inicio para que el contenido fluya hacia abajo */
-    padding-bottom: 30px; /* Espacio al final */
+    justify-content: center;
+    align-items: flex-start; /* Alinea al inicio verticalmente */
+    min-height: 100vh; /* Ocupa al menos el alto de la ventana */
+    padding-top: 30px; /* Espacio superior */
+    padding-bottom: 30px; /* Espacio inferior */
+    box-sizing: border-box; /* Incluye padding en el tamaño total */
 }
 
-.header {
-    background-color: var(--secondary-green);
-    color: var(--text-light);
-    padding: 15px 20px;
-    text-align: center;
-    width: 100%;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap; /* Permite que el contenido se ajuste en pantallas pequeñas */
+.cotizador {
+    background-color: #282828; /* Fondo más claro para el contenedor */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    width: 90%;
+    max-width: 900px; /* Ancho máximo para el cotizador */
+    box-sizing: border-box;
+    position: relative; /* Para posicionar el logo si se desea flotante */
 }
 
-.header h1 {
-    margin: 0;
-    font-size: 1.8em;
-    flex-grow: 1; /* Permite que el título ocupe espacio */
-    text-align: left; /* Alinea el título a la izquierda */
-}
-
-.header-logo-right {
-    max-width: 80px; /* Tamaño del logo */
+.cotizador .logo-inside-cotizador {
+    display: block; /* Asegura que la imagen sea un bloque */
+    margin: -10px auto 20px auto; /* Centra el logo y ajusta margen */
+    width: 150px; /* Tamaño del logo */
     height: auto;
-    margin-left: 20px; /* Espacio entre el título y el logo */
 }
 
-.calculator.general-cotizador-container {
-    max-width: 900px; /* Más ancho para la tabla de ítems */
-    width: 95%; /* Responsive */
-    margin: 20px auto;
-    background: var(--secondary-green);
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-}
-
-h2, h3 {
+.cotizador h2 {
     text-align: center;
-    color: var(--accent-green-light);
+    color: var(--gold-accent);
+    margin-bottom: 25px;
+    font-size: 2.2em;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--light-text-gold);
+}
+
+.input-group input[type="text"],
+.input-group input[type="number"],
+.input-group input[type="email"],
+.input-group input[type="date"] {
+    width: calc(100% - 18px); /* Ajuste para padding y borde */
+    padding: 10px;
+    border: 1px solid var(--medium-grey-border);
+    border-radius: 8px;
+    background-color: #3A3A3A; /* Fondo más oscuro para inputs */
+    color: var(--light-text-gold);
+    font-size: 1em;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    outline: none; /* Quita el contorno al enfocar */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: var(--gold-accent);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+}
+
+h3 {
+    color: var(--gold-accent);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--gold-primary);
+    padding-bottom: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
     margin-bottom: 20px;
 }
 
-label {
-    display: block;
-    width: 100%;
-    margin-bottom: 8px;
-    color: var(--text-light);
+table th, table td {
+    border: 1px solid var(--medium-grey-border);
+    padding: 12px;
+    text-align: left;
+    color: var(--white-text); /* Texto blanco en la tabla */
+}
+
+table thead th {
+    background-color: var(--table-header-bg); /* Fondo oscuro para encabezados */
+    color: var(--light-text-gold);
     font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9em;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="number"],
-select,
-textarea {
-    display: block;
-    width: calc(100% - 22px); /* Ancho completo menos padding y borde */
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-light-green);
-    border-radius: 8px;
-    background-color: #3a5a3a; /* Un tono más oscuro de verde para inputs */
-    color: var(--text-light);
-    box-sizing: border-box; /* Incluye padding y borde en el ancho */
+table tbody tr:nth-child(even) {
+    background-color: #2F2F2F; /* Filas pares un poco más oscuras */
 }
 
-input::placeholder, textarea::placeholder {
-    color: rgba(224, 255, 224, 0.7);
+table tbody tr:hover {
+    background-color: #3A3A3A; /* Efecto hover en filas */
+}
+
+table input[type="text"],
+table input[type="number"] {
+    width: calc(100% - 10px); /* Ajuste para padding en tabla */
+    padding: 6px;
+    border: 1px solid #666;
+    border-radius: 5px;
+    background-color: #4A4A4A;
+    color: var(--white-text);
+    box-sizing: border-box; /* Importante para que el width sea total */
+}
+
+table tfoot td {
+    background-color: #202020; /* Fondo más oscuro para el pie de tabla */
+    font-weight: bold;
+    color: var(--gold-accent);
 }
 
 button {
-    padding: 12px 20px;
-    background-color: var(--accent-green-light);
-    color: white;
-    font-size: 1em;
+    background-color: var(--button-bg);
+    color: var(--white-text);
+    padding: 14px 25px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    width: 100%;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    display: inline-block; /* Permite que los botones estén en la misma línea */
+    margin: 5px; /* Espacio entre botones */
 }
 
 button:hover {
     background-color: var(--button-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
 
-/* Estilos específicos para el cotizador general */
-.form-section {
-    margin-bottom: 30px;
-    padding: 15px;
-    border: 1px solid var(--border-light-green);
-    border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.1); /* Ligero fondo para la sección de formulario */
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
-.items-section {
-    margin-bottom: 30px;
-}
-
-.table-container {
-    overflow-x: auto; /* Permite scroll horizontal en tablas en móviles */
-    margin-bottom: 20px;
-}
-
-#itemsTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-#itemsTable th, #itemsTable td {
-    border: 1px solid var(--border-light-green);
-    padding: 8px;
-    text-align: left;
-    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
-}
-
-#itemsTable th {
-    background-color: var(--table-header-bg);
-    color: var(--text-light);
-    font-weight: bold;
-    text-align: center;
-}
-
-#itemsTable tbody tr:nth-child(odd) {
-    background-color: rgba(0, 0, 0, 0.05); /* Ligeras franjas para filas impares */
-}
-
-#itemsTable input {
-    width: calc(100% - 16px); /* Ajuste para inputs dentro de la tabla */
-    padding: 5px;
-    margin: 0;
+.delete-product-btn {
+    background-color: var(--error-red);
+    padding: 6px 10px;
     font-size: 0.9em;
+    border-radius: 5px;
+    margin: 0; /* Elimina márgenes extra */
 }
 
-#itemsTable .item-row-total, #itemsTable tfoot td {
-    text-align: right; /* Alinea los totales a la derecha */
+.delete-product-btn:hover {
+    background-color: #A00; /* Rojo más oscuro al pasar el ratón */
 }
 
-.delete-item-button {
-    background-color: var(--delete-button-bg);
-    padding: 5px 10px;
-    width: auto;
-    margin: 0 auto; /* Centra el botón en la celda */
-    display: block;
-    font-size: 0.9em;
-}
-
-.delete-item-button:hover {
-    background-color: var(--delete-button-hover);
-}
-
-.add-item-button {
-    background-color: var(--accent-green-light);
-    margin-top: 10px;
-}
-
-.generate-pdf-button {
-    background-color: var(--accent-green-light);
-    margin-top: 30px;
-    font-size: 1.1em;
-    padding: 15px 20px;
-}
-
-.cta {
-    background-color: var(--table-header-bg); /* Un color de fondo para la CTA */
-    color: var(--text-light);
-    padding: 20px;
-    text-align: center;
-    width: 100%;
-    max-width: 900px;
-    margin-top: 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-}
-
-.cta p {
-    margin-bottom: 15px;
-    font-size: 1.1em;
-}
-
-.whatsapp-button {
+.csv-upload-label {
     display: inline-block;
-    background-color: #25D366; /* Color de WhatsApp */
+    background-color: #5cb85c; /* Un verde para el botón de carga */
     color: white;
-    padding: 12px 25px;
+    padding: 14px 25px;
     border-radius: 8px;
-    text-decoration: none;
-    font-weight: bold;
+    cursor: pointer;
     font-size: 1.1em;
-    transition: background-color 0.3s ease;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    margin: 5px;
 }
 
-.whatsapp-button:hover {
-    background-color: #1DA851;
+.csv-upload-label:hover {
+    background-color: #4CAF50;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
 
-/* Media Queries para Responsiveness */
+/* Estilos para los botones de cliente */
+button#guardarClienteBtn.btn-new-client {
+    background-color: var(--client-new-btn); /* Rojo para cliente nuevo */
+    border-color: var(--client-new-btn);
+}
+
+button#guardarClienteBtn.btn-new-client:hover {
+    background-color: var(--client-new-btn-hover);
+    border-color: var(--client-new-btn-hover);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.5), 0 0 15px rgba(var(--client-new-btn-hover), 0.6);
+}
+
+button#guardarClienteBtn.btn-existing-client {
+    background-color: var(--client-existing-btn); /* Verde para cliente existente */
+    border-color: var(--client-existing-btn);
+    color: var(--white-text); /* Texto blanco para mayor contraste */
+}
+
+button#guardarClienteBtn.btn-existing-client:hover {
+    background-color: var(--client-existing-btn-hover);
+    border-color: var(--client-existing-btn-hover);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.5), 0 0 15px rgba(var(--client-existing-btn-hover), 0.6);
+}
+
+/* Estilo específico para el botón de descargar PDF */
+.buttons-container button[onclick="descargarPDF()"] {
+    background-color: var(--pdf-download-btn); /* Azul */
+    border-color: var(--pdf-download-btn);
+    color: var(--white-text);
+}
+
+.buttons-container button[onclick="descargarPDF()"]:hover {
+    background-color: var(--pdf-download-btn-hover);
+    border-color: var(--pdf-download-btn-hover);
+}
+
+
+.buttons-container {
+    text-align: center;
+    margin-top: 25px; /* Más espacio */
+    margin-bottom: 25px;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .header h1 {
-        font-size: 1.5em;
-        text-align: center;
-        width: 100%;
+    .cotizador {
+        padding: 20px;
+        border-radius: 10px;
+        padding-top: 60px; /* Ajuste para el logo */
     }
 
-    .header-logo-right {
-        margin: 10px auto 0; /* Centra el logo debajo del título en móvil */
-    }
-
-    .calculator.general-cotizador-container {
-        padding: 15px;
-    }
-
-    h2, h3 {
-        font-size: 1.4em;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"],
-    input[type="number"],
-    select,
-    textarea {
-        width: calc(100% - 20px); /* Ajuste para pantallas más pequeñas */
-        padding: 8px;
-    }
-
-    #itemsTable th, #itemsTable td {
-        padding: 6px;
-        font-size: 0.9em;
-    }
-
-    #itemsTable input {
-        padding: 4px;
-        font-size: 0.85em;
-    }
-
-    .delete-item-button {
-        padding: 3px 6px;
-        font-size: 0.8em;
+    .cotizador h2 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
     }
 
     button {
-        font-size: 0.95em;
-        padding: 10px 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .header h1 {
-        font-size: 1.3em;
+        padding: 12px 20px;
+        font-size: 1em;
+        width: calc(100% - 16px); /* Ocupa casi todo el ancho */
+        margin: 5px 0;
     }
 
-    .header-logo-right {
-        max-width: 60px;
+    .buttons-container {
+        flex-direction: column;
+        align-items: center;
     }
 
-    .calculator.general-cotizador-container {
-        padding: 10px;
+    .csv-upload-label {
+        width: calc(100% - 16px);
+        box-sizing: border-box; /* Asegura que el padding no exceda el ancho */
+        text-align: center; /* Centra el texto en el label */
     }
-
-    h2, h3 {
-        font-size: 1.2em;
-    }
-
-    /* La tabla se hará scrollable horizontalmente por overflow-x: auto */
 }
