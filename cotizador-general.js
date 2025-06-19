@@ -96,7 +96,7 @@ function calculateTotals() {
     document.getElementById('totalDisplay').textContent = `$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-// *** Función simplificada para cargar imágenes, como en tu script.js que funciona ***
+// Función simplificada para cargar imágenes, como en tu script.js que funciona
 function loadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -120,12 +120,12 @@ function generarPDFGeneral() {
     }
     const doc = new jsPDF();
 
-    // Datos del Cliente
-    const clienteNombre = document.getElementById('clienteNombre').value;
-    const clienteEmpresa = document.getElementById('clienteEmpresa').value;
-    const clienteDireccion = document.getElementById('clienteDireccion').value;
-    const clienteTelefono = document.getElementById('clienteTelefono').value;
-    const clienteCorreo = document.getElementById('clienteCorreo').value;
+    // Datos del Cliente - Asegurando que siempre sean cadenas
+    const clienteNombre = document.getElementById('clienteNombre').value || '';
+    const clienteEmpresa = document.getElementById('clienteEmpresa').value || '';
+    const clienteDireccion = document.getElementById('clienteDireccion').value || '';
+    const clienteTelefono = document.getElementById('clienteTelefono').value || '';
+    const clienteCorreo = document.getElementById('clienteCorreo').value || '';
 
     // Generar fechas y número de cotización
     const today = new Date();
@@ -189,33 +189,38 @@ function generarPDFGeneral() {
             doc.setFont('helvetica', 'bold');
             doc.text('Cliente:', rightColStartX, clientQuoteInfoCurrentY);
             doc.setFont('helvetica', 'normal');
-            doc.text(clienteNombre || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+            // *** REVISIÓN AQUÍ: Asegurar que clienteNombre es siempre una cadena ***
+            doc.text(clienteNombre, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
             clientQuoteInfoCurrentY += rightColLineSpacing;
 
             if (clienteEmpresa) { // Mostrar empresa solo si se ingresa
                 doc.setFont('helvetica', 'bold');
                 doc.text('Empresa:', rightColStartX, clientQuoteInfoCurrentY);
                 doc.setFont('helvetica', 'normal');
-                doc.text(clienteEmpresa || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+                // *** REVISIÓN AQUÍ: Asegurar que clienteEmpresa es siempre una cadena ***
+                doc.text(clienteEmpresa, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
                 clientQuoteInfoCurrentY += rightColLineSpacing;
             }
 
             doc.setFont('helvetica', 'bold');
             doc.text('Dirección:', rightColStartX, clientQuoteInfoCurrentY);
             doc.setFont('helvetica', 'normal');
-            doc.text(clienteDireccion || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+            // *** REVISIÓN AQUÍ: Asegurar que clienteDireccion es siempre una cadena ***
+            doc.text(clienteDireccion, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
             clientQuoteInfoCurrentY += rightColLineSpacing;
 
             doc.setFont('helvetica', 'bold');
             doc.text('Teléfonos:', rightColStartX, clientQuoteInfoCurrentY);
             doc.setFont('helvetica', 'normal');
-            doc.text(clienteTelefono || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+            // *** REVISIÓN AQUÍ: Asegurar que clienteTelefono es siempre una cadena ***
+            doc.text(clienteTelefono, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
             clientQuoteInfoCurrentY += rightColLineSpacing;
 
             doc.setFont('helvetica', 'bold');
             doc.text('Correo elect.:', rightColStartX, clientQuoteInfoCurrentY);
             doc.setFont('helvetica', 'normal');
-            doc.text(clienteCorreo || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+            // *** REVISIÓN AQUÍ: Asegurar que clienteCorreo es siempre una cadena ***
+            doc.text(clienteCorreo, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
             clientQuoteInfoCurrentY += 10; // Espacio después de datos del cliente
 
             // Sección de detalles de la cotización (Fechas y Número) - A la derecha, debajo de datos del cliente
@@ -225,14 +230,17 @@ function generarPDFGeneral() {
             doc.setFontSize(10);
             doc.setFont('helvetica', 'normal');
             doc.text(`Fecha de emisión:`, rightAlignX - dateLabelOffset, clientQuoteInfoCurrentY, { align: 'right' });
+            // *** REVISIÓN AQUÍ: Asegurar que emissionDate es siempre una cadena ***
             doc.text(emissionDate, rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
             clientQuoteInfoCurrentY += 7;
 
             doc.text(`Cotización N°:`, rightAlignX - dateLabelOffset, clientQuoteInfoCurrentY, { align: 'right' });
+            // *** REVISIÓN AQUÍ: Asegurar que quoteNumber se convierte a cadena ***
             doc.text(String(quoteNumber), rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
             clientQuoteInfoCurrentY += 7;
 
             doc.text(`Validez:`, rightAlignX - dateLabelOffset, clientQuoteInfoCurrentY, { align: 'right' });
+            // *** REVISIÓN AQUÍ: Asegurar que expirationDateFormatted es siempre una cadena ***
             doc.text(expirationDateFormatted, rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
             clientQuoteInfoCurrentY += 15;
             const clientQuoteInfoFinalY = clientQuoteInfoCurrentY;
@@ -242,17 +250,17 @@ function generarPDFGeneral() {
             const rows = document.querySelectorAll('#itemsTable tbody tr');
 
             rows.forEach(row => {
-                const code = row.querySelector('.item-code').value;
-                const desc = row.querySelector('.item-desc').value;
-                const unit = row.querySelector('.item-unit').value;
+                const code = row.querySelector('.item-code').value || ''; // Asegurar cadena
+                const desc = row.querySelector('.item-desc').value || ''; // Asegurar cadena
+                const unit = row.querySelector('.item-unit').value || ''; // Asegurar cadena
                 const qty = parseFloat(row.querySelector('.item-qty').value);
                 const price = parseFloat(row.querySelector('.item-price').value);
                 const itemTotal = isNaN(qty) || isNaN(price) ? 0 : qty * price;
                 tableData.push([
-                    code || '',
-                    desc || '',
-                    unit || '',
-                    qty.toString(),
+                    code,
+                    desc,
+                    unit,
+                    qty.toString(), // Asegurar que sea cadena
                     `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
                     `$${itemTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                 ]);
@@ -326,7 +334,6 @@ function generarPDFGeneral() {
 
         }).catch(error => {
             console.error("Error al cargar una imagen:", error);
-            // El mensaje de error ahora es más específico si loadImage falla
             alert("Error: No se pudo generar el PDF. " + error);
         });
 }
