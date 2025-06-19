@@ -1,0 +1,311 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #1b1b1b;
+  color: #e0ffe0;
+  padding: 20px;
+}
+.calculator {
+  max-width: 500px;
+  margin: auto;
+  background: #2e4d2c;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,255,0,0.1);
+}
+label, input, select {
+  display: block;
+  width: 100%;
+  margin-bottom: 15px;
+}
+input, select {
+  padding: 10px;
+  border: 1px solid #88ff88;
+  border-radius: 8px;
+  background-color: #3a5a3a;
+  color: #e0ffe0;
+}
+button {
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px; /* Añadido margen superior para botones */
+}
+button:hover {
+  background-color: #45a049;
+}
+#resultado {
+  margin-top: 20px;
+  font-weight: bold;
+  text-align: center;
+  color: #b5ffb5;
+}
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #2e4d2c; /* Mismo fondo que la calculadora */
+  border-radius: 12px; /* Mismo borde que la calculadora */
+  box-shadow: 0 0 15px rgba(0,255,0,0.1);
+}
+.header h1 {
+  color: #b5ffb5;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+.header p {
+  color: #e0ffe0;
+  margin-bottom: 0;
+}
+
+.cta {
+  text-align: center;
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #2e4d2c;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,255,0,0.1);
+}
+
+.cta p {
+  font-size: 1.1em;
+  color: #b5ffb5;
+  margin-bottom: 15px;
+}
+
+.whatsapp-button {
+  display: inline-block;
+  background-color: #25D366; /* Color WhatsApp */
+  color: white;
+  padding: 12px 25px;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.whatsapp-button:hover {
+  background-color: #1DA851;
+}
+
+/* Estilos existentes para .logo para el index.html */
+.logo {
+  max-width: 150px; /* Ajusta este valor si necesitas un tamaño diferente */
+  height: auto;
+  display: block;
+  margin: 0 auto 20px auto; /* Centra el logo y añade espacio debajo */
+}
+
+/* --- Nuevos estilos para el cotizador-general.html --- */
+
+/* Estilos para el encabezado del cotizador general */
+.general-header {
+    display: flex;
+    justify-content: space-between; /* Espacio entre el título y el logo */
+    align-items: center; /* Alinea verticalmente */
+    padding: 10px 20px; /* Ajusta el padding */
+    text-align: left; /* Desactiva el text-align center predeterminado del .header */
+}
+
+.general-header h1.header-title-general { /* Específico para este h1 */
+    margin: 0; /* Elimina el margen del h1 dentro del header */
+    font-size: 24px; /* Tamaño de fuente para el título */
+    color: #b5ffb5;
+    flex-grow: 1; /* Permite que ocupe el espacio restante */
+}
+
+/* Estilo para el logo a la derecha */
+.logo-right {
+    max-width: 80px; /* Haz el logo más pequeño */
+    height: auto;
+    margin-left: 20px; /* Espacio entre el título y el logo */
+}
+
+/* Contenedor para hacer la tabla scrollable en pantallas pequeñas */
+.table-responsive {
+  overflow-x: auto; /* Permite el desplazamiento horizontal de la tabla */
+  -webkit-overflow-scrolling: touch; /* Suaviza el scroll en iOS */
+  margin-bottom: 20px; /* Espacio debajo de la tabla */
+}
+
+/* Estilos para la tabla del cotizador general */
+#itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#itemsTable th, #itemsTable td {
+  border: 1px solid #88ff88;
+  padding: 8px;
+  text-align: left;
+  color: #e0ffe0;
+}
+
+#itemsTable th {
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
+}
+
+#itemsTable tbody tr:nth-child(even) {
+  background-color: #3a5a3a;
+}
+
+#itemsTable tbody tr:nth-child(odd) {
+  background-color: #2e4d2c;
+}
+
+/* Inputs dentro de la tabla */
+#itemsTable input[type="text"],
+#itemsTable input[type="number"] {
+  width: calc(100% - 10px); /* Ajusta para padding */
+  box-sizing: border-box; /* Incluye padding en el ancho */
+  padding: 5px;
+  margin-bottom: 0; /* Elimina el margen inferior predeterminado */
+}
+
+/* Botón de eliminar ítem */
+.delete-item-button {
+  background-color: #f44336; /* Rojo */
+  width: auto;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.delete-item-button:hover {
+  background-color: #da190b;
+}
+
+/* Estilos para el área de texto de observaciones */
+textarea#observaciones {
+  width: calc(100% - 20px); /* Ajusta para padding */
+  padding: 10px;
+  border: 1px solid #88ff88;
+  border-radius: 8px;
+  background-color: #3a5a3a;
+  color: #e0ffe0;
+  min-height: 80px; /* Altura mínima */
+  resize: vertical; /* Permite redimensionar verticalmente */
+  margin-bottom: 15px;
+}
+
+/* Estilos para los campos de cliente y título */
+.form-section {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #4CAF50;
+  border-radius: 8px;
+  background-color: #2e4d2c;
+}
+
+.form-section label,
+.form-section input[type="text"] {
+    margin-bottom: 10px;
+}
+
+/* --- Media Queries para Responsividad --- */
+
+@media screen and (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+  .calculator {
+    width: 95%; /* Ocupa más ancho en pantallas medianas */
+    padding: 15px;
+  }
+
+  /* Ajustes generales para el header en pantallas medianas */
+  .general-header {
+      flex-direction: column; /* Apila el título y el logo */
+      text-align: center;
+  }
+
+  .general-header h1.header-title-general {
+      font-size: 20px;
+      margin-bottom: 10px; /* Espacio entre el título y el logo apilado */
+  }
+
+  .logo-right {
+      margin-left: 0; /* Centra el logo si se apila */
+      max-width: 70px; /* Un poco más pequeño en tablets */
+  }
+
+  #itemsTable th, #itemsTable td {
+    padding: 6px;
+    font-size: 0.9em;
+  }
+
+  /* Asegura que los inputs en la tabla sean responsivos */
+  #itemsTable input {
+    font-size: 0.9em;
+    padding: 4px;
+  }
+
+  /* Reduce el tamaño del botón eliminar */
+  .delete-item-button {
+    padding: 3px 6px;
+    font-size: 0.8em;
+  }
+
+  button {
+    padding: 12px; /* Botones un poco más grandes para mejor toque */
+    font-size: 1em;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .calculator {
+    width: 100%; /* Ocupa todo el ancho disponible */
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .general-header {
+    padding: 10px;
+  }
+
+  .general-header h1.header-title-general {
+      font-size: 18px;
+      margin-bottom: 8px;
+  }
+
+  .logo-right {
+      max-width: 60px; /* Más pequeño en móviles */
+  }
+
+  /* Inputs y botones a tamaño completo en móviles */
+  label, input, select, button, textarea {
+    font-size: 0.95em;
+    padding: 8px;
+  }
+
+  /* La tabla será horizontalmente scrollable debido a .table-responsive */
+  #itemsTable {
+    min-width: 500px; /* Asegura que la tabla tenga un ancho mínimo para activar el scroll */
+  }
+
+  /* Ajustes para los inputs dentro de la tabla en móviles */
+  #itemsTable input[type="text"],
+  #itemsTable input[type="number"] {
+    width: calc(100% - 5px); /* Reduce el padding si es necesario */
+    padding: 3px;
+    font-size: 0.85em;
+  }
+
+  /* El botón de WhatsApp */
+  .whatsapp-button {
+    font-size: 0.9em;
+    padding: 10px;
+  }
+}
