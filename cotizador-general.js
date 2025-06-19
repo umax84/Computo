@@ -115,7 +115,6 @@ function generarPDFGeneral() {
 
     // Generar fechas y número de cotización
     const today = new Date();
-    // Formato dd/mm/yyyy
     const emissionDate = today.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const expirationDate = new Date(today);
     expirationDate.setDate(today.getDate() + 7);
@@ -129,77 +128,169 @@ function generarPDFGeneral() {
     logo.onload = function() {
         console.log("Logo cargado exitosamente. Continuando con la generación del PDF.");
 
+        // --- Configuración de la Marca de Agua (Watermark) ---
+        const watermarkLogo = new Image();
+        watermarkLogo.src = 'logo_mtk.png'; // Cargar el logo para la marca de agua
+
+        watermarkLogo.onload = function() {
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const watermarkWidth = 120; // Tamaño grande para la marca de agua
+            const watermarkHeight = (watermarkLogo.naturalHeight / watermarkLogo.naturalWidth) * watermarkWidth;
+            const watermarkX = (pageWidth - watermarkWidth) / 2;
+            const watermarkY = (pageHeight - watermarkHeight) / 2;
+
+            // La función didDrawPage se ejecuta por cada página de la tabla
+            doc.autoTable({
+                // ... (el resto de las configuraciones de autoTable) ...
+                didDrawPage: function (data) {
+                    // Dibujar la marca de agua en cada página
+                    doc.setGState(new doc.GState({ opacity: 0.1 })); // Opacidad baja para efecto de marca de agua
+                    doc.addImage(watermarkLogo, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+                    doc.setGState(new doc.GState({ opacity: 1 })); // Restaurar opacidad
+
+                    // Footer para páginas adicionales
+                    if (data.pageNumber > 1) {
+                        doc.setFontSize(8);
+                        doc.text('Cotización - Página ' + data.pageNumber, data.settings.margin.left, doc.internal.pageSize.height - 10);
+                    }
+                },
+                // Asegúrate de que startY para autoTable se calcula después de todo el encabezado.
+                startY: Math.max(companyInfoFinalY, clientQuoteInfoFinalY) + 10,
+                head: [['CÓDIGO', 'DESCRIPCIÓN', 'UNIDAD', 'CANTIDAD', 'PRECIO UNIT.', 'TOTAL']],
+                body: tableData,
+                theme: 'striped',
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 2,
+                    textColor: [0, 0, 0]
+                },
+                headStyles: {
+                    fillColor: [65, 126, 62], // Verde oscuro de MTK
+                    textColor: 255, // Texto blanco
+                    fontStyle: 'bold'
+                },
+                columnStyles: {
+                    0: { cellWidth: 20 }, // Código
+                    1: { cellWidth: 70 }, // Descripción
+                    2: { cellWidth: 20, halign: 'center' }, // Unidad
+                    3: { cellWidth: 25, halign: 'center' }, // Cantidad - ANCHO AJUSTADO
+                    4: { cellWidth: 30, halign: 'right' }, // Precio Unitario
+                    5: { cellWidth: 30, halign: 'right' }  // Total
+                }
+            });
+
+            // Totales al final de la tabla (después de autoTable)
+            const finalY = doc.autoTable.previous.finalY;
+            // Coordenada X para las etiquetas (Subtotal, IVA, TOTAL) - Alineado a la derecha de la columna PRECIO UNIT.
+            const totalLabelX = doc.internal.pageSize.getWidth() - doc.autoTable.previous.columnModels[5].width - doc.autoTable.previous.columnModels[4].width - 15; // 15 es el margen derecho
+
+            // Coordenada X para los valores (Subtotal$, IVA$, TOTAL$) - Alineado a la derecha de la columna TOTAL
+            const totalValueX = doc.internal.pageSize.getWidth() - 15; // 15 es el margen derecho
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Subtotal:`, totalLabelX, finalY + 7, { align: 'right' });
+            doc.text(`$${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 7, { align: 'right' });
+
+            doc.text(`IVA (16%):`, totalLabelX, finalY + 13, { align: 'right' });
+            doc.text(`$${iva.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 13, { align: 'right' });
+
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`TOTAL:`, totalLabelX, finalY + 22, { align: 'right' });
+            doc.text(`$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 22, { align: 'right' });
+            doc.setFont('helvetica', 'normal'); // Reset font style
+
+            doc.save(`Cotizacion_MTK_Servicios_${emissionDate.replace(/\//g, '-')}_${quoteNumber}.pdf`);
+        }; // Fin watermarkLogo.onload
+
+        // --- HEADER DEL PDF ---
         const imgWidth = 40; // Ajusta según el tamaño del logo en el PDF de muestra
         const imgHeight = (logo.naturalHeight / logo.naturalWidth) * imgWidth;
-        doc.addImage(logo, 'PNG', 15, 15, imgWidth, imgHeight); // Posición del logo (más hacia la izquierda y arriba)
 
-        // Información de la empresa (texto superior izquierdo)
+        // Columna Izquierda: Logo y Datos de la Empresa
+        const companyInfoStartX = 15;
+        let companyInfoCurrentY = 15;
+        doc.addImage(logo, 'PNG', companyInfoStartX, companyInfoCurrentY, imgWidth, imgHeight);
+
+        companyInfoCurrentY = 15 + imgHeight + 5; // Posición de texto debajo del logo
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0); // Negro
         doc.setFont('helvetica', 'normal');
-        doc.text('MTK SERVICIOS S.A.S DE C.V.', 15, 15 + imgHeight + 5); // Debajo del logo
-        doc.text('Av. Los Pinos 731-A Los Ángeles 2da Sec,', 15, 15 + imgHeight + 10);
-        doc.text('San Nicolás de los Garza, Nuevo León', 15, 15 + imgHeight + 15);
-        doc.text('info@mtkservicios.com', 15, 15 + imgHeight + 20); // Email
-        doc.text('Teléfonos: 81 3847 4143', 15, 15 + imgHeight + 25); // Teléfono
+        doc.text('MTK SERVICIOS S.A.S DE C.V.', companyInfoStartX, companyInfoCurrentY);
+        companyInfoCurrentY += 5;
+        doc.text('Av. Los Pinos 731-A Los Ángeles 2da Sec,', companyInfoStartX, companyInfoCurrentY);
+        companyInfoCurrentY += 5;
+        doc.text('San Nicolás de los Garza, Nuevo León', companyInfoStartX, companyInfoCurrentY);
+        companyInfoCurrentY += 5;
+        doc.text('info@mtkservicios.com', companyInfoStartX, companyInfoCurrentY);
+        companyInfoCurrentY += 5;
+        doc.text('Teléfonos: 81 3847 4143', companyInfoStartX, companyInfoCurrentY);
+        companyInfoCurrentY += 10; // Espacio final para bloque de empresa
+        const companyInfoFinalY = companyInfoCurrentY;
 
-        // Título "COTIZACIÓN"
+        // Columna Derecha: Datos del Cliente y Detalles de la Cotización
+        const rightColStartX = 110; // Inicio de la columna derecha
+        const rightColLabelOffset = 35; // Distancia para los valores de los labels
+        const rightColLineSpacing = 8; // Espaciado vertical entre líneas
+        let clientQuoteInfoCurrentY = 15; // Inicia a la misma altura que el logo izquierdo
+
+        // Título "COTIZACIÓN" (centrado en la página, pero más arriba)
         doc.setFontSize(28);
         doc.setFont('helvetica', 'bold');
-        doc.text('COTIZACIÓN', 105, 30, { align: 'center' }); // Centrado
+        doc.text('COTIZACIÓN', pageWidth / 2, 25, { align: 'center' }); // Centrado horizontalmente
 
-        // Sección de detalles de la cotización (fechas y número) - Alineado a la derecha
+        // Sección de detalles de la cotización (Fechas y Número) - Alineado a la derecha
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         const rightAlignX = 195; // Margen derecho para alineación
-        let currentY = 50; // Posición inicial para esta sección
+        clientQuoteInfoCurrentY = 40; // Nueva posición más arriba para fechas
 
-        doc.text(`Fecha de emisión:`, rightAlignX - 40, currentY, { align: 'right' });
-        doc.text(emissionDate, rightAlignX, currentY, { align: 'right' });
-        currentY += 7;
+        doc.text(`Fecha de emisión:`, rightAlignX - 40, clientQuoteInfoCurrentY, { align: 'right' });
+        doc.text(emissionDate, rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
+        clientQuoteInfoCurrentY += 7;
 
-        doc.text(`Cotización N°:`, rightAlignX - 40, currentY, { align: 'right' });
-        doc.text(String(quoteNumber), rightAlignX, currentY, { align: 'right' });
-        currentY += 7;
+        doc.text(`Cotización N°:`, rightAlignX - 40, clientQuoteInfoCurrentY, { align: 'right' });
+        doc.text(String(quoteNumber), rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
+        clientQuoteInfoCurrentY += 7;
 
-        doc.text(`Validez:`, rightAlignX - 40, currentY, { align: 'right' });
-        doc.text(expirationDateFormatted, rightAlignX, currentY, { align: 'right' });
-        currentY += 15; // Espacio después de esta sección
+        doc.text(`Validez:`, rightAlignX - 40, clientQuoteInfoCurrentY, { align: 'right' });
+        doc.text(expirationDateFormatted, rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
+        clientQuoteInfoCurrentY += 15; // Espacio después de esta sección
 
-        // Sección de datos del cliente - Alineado a la izquierda
-        let clientY = currentY; // Usar la Y actual
-        const leftAlignX = 15; // Margen izquierdo para alineación
-        const labelOffset = 35; // Distancia para los valores desde el inicio de la etiqueta
-        const lineSpacing = 8; // Espaciado vertical entre líneas
+        // Sección de datos del cliente - A la derecha, debajo de las fechas de cotización
+        // Ajusta la posición vertical inicial para que no se superponga con lo anterior
+        clientQuoteInfoCurrentY = Math.max(clientQuoteInfoCurrentY, 70); // Asegura que no suba demasiado si las fechas son cortas
 
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
-        doc.text('Cliente:', leftAlignX, clientY);
+        doc.text('Cliente:', rightColStartX, clientQuoteInfoCurrentY);
         doc.setFont('helvetica', 'normal');
-        doc.text(clienteNombre || '', leftAlignX + labelOffset, clientY);
-        clientY += lineSpacing;
-
-        // C.I.F/DNI: REMOVIDO PARA SIMPLIFICAR
+        doc.text(clienteNombre || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+        clientQuoteInfoCurrentY += rightColLineSpacing;
 
         doc.setFont('helvetica', 'bold');
-        doc.text('Dirección:', leftAlignX, clientY);
+        doc.text('Dirección:', rightColStartX, clientQuoteInfoCurrentY);
         doc.setFont('helvetica', 'normal');
-        doc.text(clienteDireccion || '', leftAlignX + labelOffset, clientY);
-        clientY += lineSpacing;
+        doc.text(clienteDireccion || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+        clientQuoteInfoCurrentY += rightColLineSpacing;
 
         doc.setFont('helvetica', 'bold');
-        doc.text('Teléfonos:', leftAlignX, clientY);
+        doc.text('Teléfonos:', rightColStartX, clientQuoteInfoCurrentY);
         doc.setFont('helvetica', 'normal');
-        doc.text(clienteTelefono || '', leftAlignX + labelOffset, clientY);
-        clientY += lineSpacing;
+        doc.text(clienteTelefono || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+        clientQuoteInfoCurrentY += rightColLineSpacing;
 
         doc.setFont('helvetica', 'bold');
-        doc.text('Correo elect.:', leftAlignX, clientY);
+        doc.text('Correo elect.:', rightColStartX, clientQuoteInfoCurrentY);
         doc.setFont('helvetica', 'normal');
-        doc.text(clienteCorreo || '', leftAlignX + labelOffset, clientY);
-        clientY += 15; // Espacio antes de la tabla
+        doc.text(clienteCorreo || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+        clientQuoteInfoCurrentY += 15; // Espacio antes de la tabla
+        const clientQuoteInfoFinalY = clientQuoteInfoCurrentY;
 
 
+        // --- PREPARACIÓN DE DATOS DE LA TABLA ---
         const tableData = [];
         const rows = document.querySelectorAll('#itemsTable tbody tr');
 
@@ -224,59 +315,10 @@ function generarPDFGeneral() {
         const iva = parseFloat(document.getElementById('ivaDisplay').textContent.replace('$', '').replace(/,/g, ''));
         const total = parseFloat(document.getElementById('totalDisplay').textContent.replace('$', '').replace(/,/g, ''));
 
-        doc.autoTable({
-            startY: clientY,
-            head: [['CÓDIGO', 'DESCRIPCIÓN', 'UNIDAD', 'CANTIDAD', 'PRECIO UNIT.', 'TOTAL']],
-            body: tableData,
-            theme: 'striped',
-            styles: {
-                fontSize: 9,
-                cellPadding: 2,
-                textColor: [0, 0, 0]
-            },
-            headStyles: {
-                fillColor: [65, 126, 62], // Verde oscuro de MTK
-                textColor: 255, // Texto blanco
-                fontStyle: 'bold'
-            },
-            columnStyles: {
-                0: { cellWidth: 20 }, // Código
-                1: { cellWidth: 70 }, // Descripción (más ancha)
-                2: { cellWidth: 20, halign: 'center' }, // Unidad
-                3: { cellWidth: 25, halign: 'center' }, // Cantidad - AUMENTADO PARA EVITAR CORTE
-                4: { cellWidth: 30, halign: 'right' }, // Precio Unitario
-                5: { cellWidth: 30, halign: 'right' }  // Total
-            },
-            didDrawPage: function (data) {
-                // Footer para páginas adicionales
-                if (data.pageNumber > 1) {
-                    doc.setFontSize(8);
-                    doc.text('Cotización - Página ' + data.pageNumber, data.settings.margin.left, doc.internal.pageSize.height - 10);
-                }
-            }
-        });
-
-        // Totales al final de la tabla
-        const finalY = doc.autoTable.previous.finalY;
-        // Ajustado para alinear los labels de Subtotal, IVA, Total con la columna de Precio Unit.
-        const totalLabelX = rightAlignX - 65; 
-
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Subtotal:`, totalLabelX, finalY + 7, { align: 'right' });
-        doc.text(`$${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, rightAlignX, finalY + 7, { align: 'right' });
-
-        doc.text(`IVA (16%):`, totalLabelX, finalY + 13, { align: 'right' });
-        doc.text(`$${iva.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, rightAlignX, finalY + 13, { align: 'right' });
-
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`TOTAL:`, totalLabelX, finalY + 22, { align: 'right' });
-        doc.text(`$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, rightAlignX, finalY + 22, { align: 'right' });
-        doc.setFont('helvetica', 'normal'); // Reset font style
-
-        doc.save(`Cotizacion_MTK_Servicios_${emissionDate.replace(/\//g, '-')}_${quoteNumber}.pdf`);
-    };
+        // El autoTable y los totales se dibujan dentro de watermarkLogo.onload
+        // para asegurar que la marca de agua se dibuje primero.
+        watermarkLogo.src = 'logo_mtk.png'; // Reafirmar src por si acaso
+    }; // Fin logo.onload (para logo superior izquierdo)
 
     logo.onerror = function() {
         console.error('ERROR: No se pudo cargar la imagen del logo para el PDF. Asegúrate de que "logo_mtk.png" existe en la misma carpeta que tu archivo HTML y JavaScript y que lo estás sirviendo a través de un servidor web local (ej. Python http.server o Live Server de VS Code).');
