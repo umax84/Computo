@@ -100,10 +100,20 @@ function calculateTotals() {
 }
 
 // Función para cargar imágenes para jsPDF
+// Ahora también verifica si la imagen tiene dimensiones válidas
 function loadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.onload = () => resolve(img);
+        img.onload = () => {
+            // Verifica que la imagen tenga dimensiones válidas
+            if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                resolve(img);
+            } else {
+                // Si la imagen cargó pero sus dimensiones son 0 (imagen corrupta o no válida)
+                console.error(`Imagen cargada pero dimensiones no válidas: ${src}`);
+                reject(`La imagen '${src}' no es válida o está corrupta.`);
+            }
+        };
         img.onerror = (e) => {
             console.error(`Error al cargar la imagen: ${src}`, e);
             reject(`No se pudo cargar la imagen: ${src}. Asegúrate de que existe y la ruta es correcta.`);
@@ -151,190 +161,198 @@ function generarPDFGeneral() {
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
 
-            try {
-                // --- HEADER DEL PDF ---
+            // --- HEADER DEL PDF ---
 
-                // Columna Izquierda: Logo y Datos de la Empresa
-                const companyInfoStartX = 15;
-                let companyInfoCurrentY = 15;
-                const imgWidth = 40;
-                const imgHeight = (mainLogo.naturalHeight / mainLogo.naturalWidth) * imgWidth;
-                doc.addImage(mainLogo, 'PNG', companyInfoStartX, companyInfoCurrentY, imgWidth, imgHeight);
+            // Columna Izquierda: Logo y Datos de la Empresa
+            const companyInfoStartX = 15;
+            let companyInfoCurrentY = 15;
+            const imgWidth = 40;
+            // Validar imgHeight para evitar NaN
+            const imgHeight = (mainLogo && mainLogo.naturalWidth > 0) ? (mainLogo.naturalHeight / mainLogo.naturalWidth) * imgWidth : 20; // Default a 20 si no es válida
+            
+            // Solo añadir la imagen si es un objeto Image válido
+            if (mainLogo instanceof Image && mainLogo.naturalWidth > 0 && mainLogo.naturalHeight > 0) {
+                 doc.addImage(mainLogo, 'PNG', companyInfoStartX, companyInfoCurrentY, imgWidth, imgHeight);
+            } else {
+                console.warn("No se pudo añadir el logo principal al PDF porque no es un objeto Image válido o no tiene dimensiones.");
+            }
+           
 
-                companyInfoCurrentY = 15 + imgHeight + 5; // Posición de texto debajo del logo
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0); // Negro
-                doc.setFont('helvetica', 'normal');
-                doc.text('MTK SERVICIOS S.A.S DE C.V.', companyInfoStartX, companyInfoCurrentY);
-                companyInfoCurrentY += 5;
-                doc.text('Av. Los Pinos 731-A Los Ángeles 2da Sec,', companyInfoStartX, companyInfoCurrentY);
-                companyInfoCurrentY += 5;
-                doc.text('San Nicolás de los Garza, Nuevo León', companyInfoStartX, companyInfoCurrentY);
-                companyInfoCurrentY += 5;
-                doc.text('info@mtkservicios.com', companyInfoStartX, companyInfoCurrentY);
-                companyInfoCurrentY += 5;
-                doc.text('Teléfonos: 81 3847 4143', companyInfoStartX, companyInfoCurrentY);
-                const companyInfoFinalY = companyInfoCurrentY + 10; // Espacio final para bloque de empresa
+            companyInfoCurrentY = companyInfoCurrentY + imgHeight + 5; // Posición de texto debajo del logo
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0); // Negro
+            doc.setFont('helvetica', 'normal');
+            doc.text('MTK SERVICIOS S.A.S DE C.V.', companyInfoStartX, companyInfoCurrentY);
+            companyInfoCurrentY += 5;
+            doc.text('Av. Los Pinos 731-A Los Ángeles 2da Sec,', companyInfoStartX, companyInfoCurrentY);
+            companyInfoCurrentY += 5;
+            doc.text('San Nicolás de los Garza, Nuevo León', companyInfoStartX, companyInfoCurrentY);
+            companyInfoCurrentY += 5;
+            doc.text('info@mtkservicios.com', companyInfoStartX, companyInfoCurrentY);
+            companyInfoCurrentY += 5;
+            doc.text('Teléfonos: 81 3847 4143', companyInfoStartX, companyInfoCurrentY);
+            const companyInfoFinalY = companyInfoCurrentY + 10; // Espacio final para bloque de empresa
 
-                // Columna Derecha: Datos del Cliente y Detalles de la Cotización
-                const rightColStartX = pageWidth / 2 + 10;
-                const rightColLabelOffset = 35;
-                const rightColLineSpacing = 8;
-                let clientQuoteInfoCurrentY = 15;
+            // Columna Derecha: Datos del Cliente y Detalles de la Cotización
+            const rightColStartX = pageWidth / 2 + 10;
+            const rightColLabelOffset = 35;
+            const rightColLineSpacing = 8;
+            let clientQuoteInfoCurrentY = 15;
 
-                // Título "COTIZACIÓN" (centrado en la página)
-                doc.setFontSize(28);
+            // Título "COTIZACIÓN" (centrado en la página)
+            doc.setFontSize(28);
+            doc.setFont('helvetica', 'bold');
+            doc.text('COTIZACIÓN', pageWidth / 2, 25, { align: 'center' });
+
+            // Sección de datos del cliente
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Cliente:', rightColStartX, clientQuoteInfoCurrentY);
+            doc.setFont('helvetica', 'normal');
+            doc.text(clienteNombre, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+            clientQuoteInfoCurrentY += rightColLineSpacing;
+
+            if (clienteEmpresa) {
                 doc.setFont('helvetica', 'bold');
-                doc.text('COTIZACIÓN', pageWidth / 2, 25, { align: 'center' });
-
-                // Sección de datos del cliente
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Cliente:', rightColStartX, clientQuoteInfoCurrentY);
+                doc.text('Empresa:', rightColStartX, clientQuoteInfoCurrentY);
                 doc.setFont('helvetica', 'normal');
-                doc.text(clienteNombre, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+                doc.text(clienteEmpresa, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
                 clientQuoteInfoCurrentY += rightColLineSpacing;
+            }
 
-                if (clienteEmpresa) {
-                    doc.setFont('helvetica', 'bold');
-                    doc.text('Empresa:', rightColStartX, clientQuoteInfoCurrentY);
-                    doc.setFont('helvetica', 'normal');
-                    doc.text(clienteEmpresa, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
-                    clientQuoteInfoCurrentY += rightColLineSpacing;
-                }
+            doc.setFont('helvetica', 'bold');
+            doc.text('Dirección:', rightColStartX, clientQuoteInfoCurrentY);
+            doc.setFont('helvetica', 'normal');
+            doc.text(clienteDireccion, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+            clientQuoteInfoCurrentY += rightColLineSpacing;
 
-                doc.setFont('helvetica', 'bold');
-                doc.text('Dirección:', rightColStartX, clientQuoteInfoCurrentY);
-                doc.setFont('helvetica', 'normal');
-                doc.text(clienteDireccion, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
-                clientQuoteInfoCurrentY += rightColLineSpacing;
+            doc.setFont('helvetica', 'bold');
+            doc.text('Teléfonos:', rightColStartX, clientQuoteInfoCurrentY);
+            doc.setFont('helvetica', 'normal');
+            doc.text(clienteTelefono, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+            clientQuoteInfoCurrentY += rightColLineSpacing;
 
-                doc.setFont('helvetica', 'bold');
-                doc.text('Teléfonos:', rightColStartX, clientQuoteInfoCurrentY);
-                doc.setFont('helvetica', 'normal');
-                doc.text(clienteTelefono, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
-                clientQuoteInfoCurrentY += rightColLineSpacing;
+            doc.setFont('helvetica', 'bold');
+            doc.text('Correo elect.:', rightColStartX, clientQuoteInfoCurrentY);
+            doc.setFont('helvetica', 'normal');
+            doc.text(clienteCorreo, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+            clientQuoteInfoCurrentY += 10; // Espacio después de datos del cliente
 
-                doc.setFont('helvetica', 'bold');
-                doc.text('Correo elect.:', rightColStartX, clientQuoteInfoCurrentY);
-                doc.setFont('helvetica', 'normal');
-                doc.text(clienteCorreo, rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
-                clientQuoteInfoCurrentY += 10; // Espacio después de datos del cliente
+            // Sección de detalles de la cotización (Fechas y Número)
+            const rightAlignX = pageWidth - 15;
+            const dateLabelOffset = 40;
 
-                // Sección de detalles de la cotización (Fechas y Número)
-                const rightAlignX = pageWidth - 15;
-                const dateLabelOffset = 40;
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Fecha de emisión:`, rightAlignX - dateLabelOffset, clientQuoteInfoCurrentY, { align: 'right' });
+            doc.text(emissionDate, rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
+            clientQuoteInfoCurrentY += 7;
 
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Fecha de emisión:`, rightAlignX - dateLabelOffset, clientQuoteInfoCurrentY, { align: 'right' });
-                doc.text(emissionDate, rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
-                clientQuoteInfoCurrentY += 7;
+            doc.text(`Cotización N°:`, rightAlignX - dateLabelOffset, clientQuoteInfoCurrentY, { align: 'right' });
+            doc.text(String(quoteNumber), rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
+            clientQuoteInfoCurrentY += 7;
 
-                doc.text(`Cotización N°:`, rightAlignX - dateLabelOffset, clientQuoteInfoCurrentY, { align: 'right' });
-                doc.text(String(quoteNumber), rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
-                clientQuoteInfoCurrentY += 7;
+            doc.text(`Validez:`, rightAlignX - dateLabelOffset, clientQuoteInfoCurrentY, { align: 'right' });
+            doc.text(expirationDateFormatted, rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
+            const clientQuoteInfoFinalY = clientQuoteInfoCurrentY + 15;
 
-                doc.text(`Validez:`, rightAlignX - dateLabelOffset, clientQuoteInfoCurrentY, { align: 'right' });
-                doc.text(expirationDateFormatted, rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
-                const clientQuoteInfoFinalY = clientQuoteInfoCurrentY + 15;
+            // --- PREPARACIÓN DE DATOS DE LA TABLA ---
+            const tableData = [];
+            const rows = document.querySelectorAll('#itemsTable tbody tr');
 
-                // --- PREPARACIÓN DE DATOS DE LA TABLA ---
-                const tableData = [];
-                const rows = document.querySelectorAll('#itemsTable tbody tr');
+            rows.forEach(row => {
+                const code = row.querySelector('.item-code').value || '';
+                const desc = row.querySelector('.item-desc').value || '';
+                const unit = row.querySelector('.item-unit').value || '';
+                const qty = parseFloat(row.querySelector('.item-qty').value);
+                const price = parseFloat(row.querySelector('.item-price').value);
+                const itemTotal = isNaN(qty) || isNaN(price) ? 0 : qty * price;
+                tableData.push([
+                    code,
+                    desc,
+                    unit,
+                    qty.toString(),
+                    `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                    `$${itemTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                ]);
+            });
 
-                rows.forEach(row => {
-                    const code = row.querySelector('.item-code').value || '';
-                    const desc = row.querySelector('.item-desc').value || '';
-                    const unit = row.querySelector('.item-unit').value || '';
-                    const qty = parseFloat(row.querySelector('.item-qty').value);
-                    const price = parseFloat(row.querySelector('.item-price').value);
-                    const itemTotal = isNaN(qty) || isNaN(price) ? 0 : qty * price;
-                    tableData.push([
-                        code,
-                        desc,
-                        unit,
-                        qty.toString(),
-                        `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-                        `$${itemTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                    ]);
-                });
+            const subtotal = parseFloat(document.getElementById('subtotalDisplay').textContent.replace('$', '').replace(/,/g, ''));
+            const iva = parseFloat(document.getElementById('ivaDisplay').textContent.replace('$', '').replace(/,/g, ''));
+            const total = parseFloat(document.getElementById('totalDisplay').textContent.replace('$', '').replace(/,/g, ''));
 
-                const subtotal = parseFloat(document.getElementById('subtotalDisplay').textContent.replace('$', '').replace(/,/g, ''));
-                const iva = parseFloat(document.getElementById('ivaDisplay').textContent.replace('$', '').replace(/,/g, ''));
-                const total = parseFloat(document.getElementById('totalDisplay').textContent.replace('$', '').replace(/,/g, ''));
+            // --- GENERACIÓN DE LA TABLA Y MARCA DE AGUA ---
+            let watermarkWidth = 120;
+            // Validar watermarkHeight para evitar NaN
+            let watermarkHeight = (watermarkImage && watermarkImage.naturalWidth > 0) ? (watermarkImage.naturalHeight / watermarkImage.naturalWidth) * watermarkWidth : 60; // Default a 60 si no es válida
 
-                // --- GENERACIÓN DE LA TABLA Y MARCA DE AGUA ---
-                const watermarkWidth = 120;
-                const watermarkHeight = (watermarkImage.naturalHeight / watermarkImage.naturalWidth) * watermarkWidth;
-                const watermarkX = (pageWidth - watermarkWidth) / 2;
-                const watermarkY = (pageHeight - watermarkHeight) / 2;
+            const watermarkX = (pageWidth - watermarkWidth) / 2;
+            const watermarkY = (pageHeight - watermarkHeight) / 2;
 
-                doc.autoTable({
-                    startY: Math.max(companyInfoFinalY, clientQuoteInfoFinalY) + 10,
-                    head: [['CÓDIGO', 'DESCRIPCIÓN', 'UNIDAD', 'CANTIDAD', 'PRECIO UNIT.', 'TOTAL']],
-                    body: tableData,
-                    theme: 'striped',
-                    styles: {
-                        fontSize: 9,
-                        cellPadding: 2,
-                        textColor: [0, 0, 0]
-                    },
-                    headStyles: {
-                        fillColor: [65, 126, 62], // Color verde oscuro de tu tema
-                        textColor: 255,
-                        fontStyle: 'bold'
-                    },
-                    columnStyles: {
-                        0: { cellWidth: 20 },
-                        1: { cellWidth: 70 },
-                        2: { cellWidth: 20, halign: 'center' },
-                        3: { cellWidth: 25, halign: 'center' },
-                        4: { cellWidth: 30, halign: 'right' },
-                        5: { cellWidth: 30, halign: 'right' }
-                    },
-                    didDrawPage: function (data) {
-                        // Marca de agua
+            doc.autoTable({
+                startY: Math.max(companyInfoFinalY, clientQuoteInfoFinalY) + 10,
+                head: [['CÓDIGO', 'DESCRIPCIÓN', 'UNIDAD', 'CANTIDAD', 'PRECIO UNIT.', 'TOTAL']],
+                body: tableData,
+                theme: 'striped',
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 2,
+                    textColor: [0, 0, 0]
+                },
+                headStyles: {
+                    fillColor: [65, 126, 62], // Color verde oscuro de tu tema
+                    textColor: 255,
+                    fontStyle: 'bold'
+                },
+                columnStyles: {
+                    0: { cellWidth: 20 },
+                    1: { cellWidth: 70 },
+                    2: { cellWidth: 20, halign: 'center' },
+                    3: { cellWidth: 25, halign: 'center' },
+                    4: { cellWidth: 30, halign: 'right' },
+                    5: { cellWidth: 30, halign: 'right' }
+                },
+                didDrawPage: function (data) {
+                    // Marca de agua - Solo si la imagen es válida
+                    if (watermarkImage instanceof Image && watermarkImage.naturalWidth > 0 && watermarkImage.naturalHeight > 0) {
                         doc.setGState(new doc.GState({ opacity: 0.1 }));
                         doc.addImage(watermarkImage, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
                         doc.setGState(new doc.GState({ opacity: 1 }));
-
-                        // Número de página
-                        if (data.pageNumber > 0) { // Siempre muestra el número de página
-                            doc.setFontSize(8);
-                            doc.text('Página ' + data.pageNumber, data.settings.margin.left, doc.internal.pageSize.height - 10);
-                        }
+                    } else {
+                        console.warn("No se pudo añadir la marca de agua al PDF porque no es un objeto Image válido o no tiene dimensiones.");
                     }
-                });
 
-                // Totales al final de la tabla
-                const finalY = doc.autoTable.previous.finalY;
-                const totalLabelX = doc.autoTable.previous.columns[4].x + doc.autoTable.previous.columns[4].width;
-                const totalValueX = doc.autoTable.previous.columns[5].x + doc.autoTable.previous.columns[5].width;
+                    // Número de página
+                    if (data.pageNumber > 0) { // Siempre muestra el número de página
+                        doc.setFontSize(8);
+                        doc.text('Página ' + data.pageNumber, data.settings.margin.left, doc.internal.pageSize.height - 10);
+                    }
+                }
+            });
 
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Subtotal:`, totalLabelX, finalY + 7, { align: 'right' });
-                doc.text(`$${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 7, { align: 'right' });
+            // Totales al final de la tabla
+            const finalY = doc.autoTable.previous.finalY;
+            const totalLabelX = doc.autoTable.previous.columns[4].x + doc.autoTable.previous.columns[4].width;
+            const totalValueX = doc.autoTable.previous.columns[5].x + doc.autoTable.previous.columns[5].width;
 
-                doc.text(`IVA (16%):`, totalLabelX, finalY + 13, { align: 'right' });
-                doc.text(`$${iva.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 13, { align: 'right' });
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Subtotal:`, totalLabelX, finalY + 7, { align: 'right' });
+            doc.text(`$${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 7, { align: 'right' });
 
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'bold');
-                doc.text(`TOTAL:`, totalLabelX, finalY + 22, { align: 'right' });
-                doc.text(`$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 22, { align: 'right' });
-                doc.setFont('helvetica', 'normal'); // Restablecer la fuente
+            doc.text(`IVA (16%):`, totalLabelX, finalY + 13, { align: 'right' });
+            doc.text(`$${iva.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 13, { align: 'right' });
 
-                doc.save(`Cotizacion_MTK_Servicios_${emissionDate.replace(/\//g, '-')}_${quoteNumber}.pdf`);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`TOTAL:`, totalLabelX, finalY + 22, { align: 'right' });
+            doc.text(`$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 22, { align: 'right' });
+            doc.setFont('helvetica', 'normal'); // Restablecer la fuente
 
-            } catch (innerError) {
-                console.error("Error detallado durante la generación del PDF:", innerError);
-                alert("Error: No se pudo generar el PDF. " + (innerError.message || "Un error desconocido ocurrió durante la creación del PDF. Revisa la consola para más detalles."));
-            }
+            doc.save(`Cotizacion_MTK_Servicios_${emissionDate.replace(/\//g, '-')}_${quoteNumber}.pdf`);
 
         }).catch(error => {
-            console.error("Error al cargar una imagen:", error);
+            console.error("Error al cargar la imagen principal o la marca de agua:", error);
             alert("Error: No se pudo generar el PDF. " + error);
         });
 }
