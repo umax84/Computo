@@ -19,6 +19,9 @@ body {
     padding: 0;
     margin: 0;
     line-height: 1.6;
+    min-height: 100vh; /* Asegura que el body ocupe al menos toda la altura de la ventana */
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header */
@@ -59,6 +62,7 @@ body {
     padding: 20px;
     display: flex;
     justify-content: center; /* Centra el contenido en pantallas grandes */
+    flex-grow: 1; /* Permite que el contenedor principal ocupe el espacio restante */
 }
 
 .cotizador-section {
@@ -69,6 +73,8 @@ body {
     max-width: 900px; /* Ancho máximo para la sección de cotizador */
     width: 100%; /* Asegura que ocupe el ancho disponible */
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 h2, h3 {
@@ -101,7 +107,8 @@ h2, h3 {
 
 .form-group input[type="text"],
 .form-group input[type="tel"],
-.form-group input[type="email"] {
+.form-group input[type="email"],
+.form-group input[type="number"] { /* Asegurarse de que los inputs de número también tengan estilo */
     width: 100%;
     padding: 12px;
     border: 1px solid var(--table-border); /* Borde suave */
@@ -123,6 +130,7 @@ h2, h3 {
 .table-container {
     overflow-x: auto; /* Permite scroll horizontal en pantallas pequeñas */
     margin-bottom: 20px;
+    width: 100%; /* Asegura que el contenedor de la tabla ocupe todo el ancho disponible */
 }
 
 #itemsTable {
@@ -130,7 +138,7 @@ h2, h3 {
     border-collapse: collapse;
     margin-top: 15px;
     font-size: 0.9em;
-    min-width: 600px; /* Mínimo ancho para la tabla si no cabe en pantalla */
+    min-width: 650px; /* Mínimo ancho para la tabla para evitar que se comprima demasiado */
 }
 
 #itemsTable th,
@@ -181,6 +189,7 @@ h2, h3 {
     width: auto; /* Ajusta el ancho al contenido */
     display: block;
     margin: 0 auto; /* Centra el botón si la celda es más ancha */
+    white-space: nowrap; /* Evita que el texto del botón se rompa */
 }
 
 #itemsTable .delete-item-button:hover {

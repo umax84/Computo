@@ -123,17 +123,17 @@ function generarPDFGeneral() {
     const quoteNumber = generateQuoteNumber();
 
     // Promesas para cargar las imágenes (logo principal y marca de agua)
-    // Usaremos logo_mtk.png como referencia. Si usas .jpg, asegúrate de cambiar la extensión aquí.
+    // Confirmado: el archivo esperado es logo_mtk.png
     const logoPromise = new Promise((resolve, reject) => {
         const img = new Image();
-        img.src = 'logo_mtk.png'; // Usar .png como referencia
+        img.src = 'logo_mtk.png'; // Ruta de la imagen para el encabezado del PDF
         img.onload = () => resolve(img);
         img.onerror = () => reject('Error cargando logo_mtk.png');
     });
 
     const watermarkLogoPromise = new Promise((resolve, reject) => {
         const wmImg = new Image();
-        wmImg.src = 'logo_mtk.png'; // Usar .png como referencia
+        wmImg.src = 'logo_mtk.png'; // Ruta de la imagen para la marca de agua
         wmImg.onload = () => resolve(wmImg);
         wmImg.onerror = () => reject('Error cargando logo de marca de agua');
     });
