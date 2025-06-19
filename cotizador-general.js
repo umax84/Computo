@@ -109,14 +109,14 @@ function generarPDFGeneral() {
 
     // Datos del Cliente
     const clienteNombre = document.getElementById('clienteNombre').value;
-    const clienteEmpresa = document.getElementById('clienteEmpresa').value; // Usado solo para contexto, no en el PDF de muestra
     const clienteDireccion = document.getElementById('clienteDireccion').value;
     const clienteTelefono = document.getElementById('clienteTelefono').value;
     const clienteCorreo = document.getElementById('clienteCorreo').value;
 
     // Generar fechas y número de cotización
     const today = new Date();
-    const emissionDate = today.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }); // Formato dd/mm/yyyy
+    // Formato dd/mm/yyyy
+    const emissionDate = today.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const expirationDate = new Date(today);
     expirationDate.setDate(today.getDate() + 7);
     const expirationDateFormatted = expirationDate.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -169,36 +169,34 @@ function generarPDFGeneral() {
         // Sección de datos del cliente - Alineado a la izquierda
         let clientY = currentY; // Usar la Y actual
         const leftAlignX = 15; // Margen izquierdo para alineación
+        const labelOffset = 35; // Distancia para los valores desde el inicio de la etiqueta
+        const lineSpacing = 8; // Espaciado vertical entre líneas
 
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.text('Cliente:', leftAlignX, clientY);
         doc.setFont('helvetica', 'normal');
-        doc.text(clienteNombre || 'N/A', leftAlignX + 25, clientY); // Ajusta X para alinear el valor
-        clientY += 7;
+        doc.text(clienteNombre || '', leftAlignX + labelOffset, clientY);
+        clientY += lineSpacing;
 
-        doc.setFont('helvetica', 'bold');
-        doc.text('C.I.F/DNI:', leftAlignX, clientY); // Campo vacío en la muestra
-        doc.setFont('helvetica', 'normal');
-        doc.text('', leftAlignX + 25, clientY);
-        clientY += 7;
+        // C.I.F/DNI: REMOVIDO PARA SIMPLIFICAR
 
         doc.setFont('helvetica', 'bold');
         doc.text('Dirección:', leftAlignX, clientY);
         doc.setFont('helvetica', 'normal');
-        doc.text(clienteDireccion || 'N/A', leftAlignX + 25, clientY);
-        clientY += 7;
+        doc.text(clienteDireccion || '', leftAlignX + labelOffset, clientY);
+        clientY += lineSpacing;
 
         doc.setFont('helvetica', 'bold');
         doc.text('Teléfonos:', leftAlignX, clientY);
         doc.setFont('helvetica', 'normal');
-        doc.text(clienteTelefono || 'N/A', leftAlignX + 25, clientY);
-        clientY += 7;
+        doc.text(clienteTelefono || '', leftAlignX + labelOffset, clientY);
+        clientY += lineSpacing;
 
         doc.setFont('helvetica', 'bold');
         doc.text('Correo elect.:', leftAlignX, clientY);
         doc.setFont('helvetica', 'normal');
-        doc.text(clienteCorreo || 'N/A', leftAlignX + 25, clientY);
+        doc.text(clienteCorreo || '', leftAlignX + labelOffset, clientY);
         clientY += 15; // Espacio antes de la tabla
 
 
@@ -213,9 +211,9 @@ function generarPDFGeneral() {
             const price = parseFloat(row.querySelector('.item-price').value);
             const itemTotal = isNaN(qty) || isNaN(price) ? 0 : qty * price;
             tableData.push([
-                code || 'N/A',
-                desc || 'N/A',
-                unit || 'N/A',
+                code || '',
+                desc || '',
+                unit || '',
                 qty.toString(),
                 `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
                 `$${itemTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -232,9 +230,9 @@ function generarPDFGeneral() {
             body: tableData,
             theme: 'striped',
             styles: {
-                fontSize: 9, // Un poco más pequeña para encajar
+                fontSize: 9,
                 cellPadding: 2,
-                textColor: [0, 0, 0] // Texto negro
+                textColor: [0, 0, 0]
             },
             headStyles: {
                 fillColor: [65, 126, 62], // Verde oscuro de MTK
@@ -245,7 +243,7 @@ function generarPDFGeneral() {
                 0: { cellWidth: 20 }, // Código
                 1: { cellWidth: 70 }, // Descripción (más ancha)
                 2: { cellWidth: 20, halign: 'center' }, // Unidad
-                3: { cellWidth: 20, halign: 'center' }, // Cantidad
+                3: { cellWidth: 25, halign: 'center' }, // Cantidad - AUMENTADO PARA EVITAR CORTE
                 4: { cellWidth: 30, halign: 'right' }, // Precio Unitario
                 5: { cellWidth: 30, halign: 'right' }  // Total
             },
@@ -260,18 +258,20 @@ function generarPDFGeneral() {
 
         // Totales al final de la tabla
         const finalY = doc.autoTable.previous.finalY;
+        // Ajustado para alinear los labels de Subtotal, IVA, Total con la columna de Precio Unit.
+        const totalLabelX = rightAlignX - 65; 
 
-        doc.setFontSize(10); // Menos tamaño que antes para que encaje mejor
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Subtotal:`, rightAlignX - 30, finalY + 7, { align: 'right' });
+        doc.text(`Subtotal:`, totalLabelX, finalY + 7, { align: 'right' });
         doc.text(`$${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, rightAlignX, finalY + 7, { align: 'right' });
 
-        doc.text(`IVA (16%):`, rightAlignX - 30, finalY + 13, { align: 'right' });
+        doc.text(`IVA (16%):`, totalLabelX, finalY + 13, { align: 'right' });
         doc.text(`$${iva.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, rightAlignX, finalY + 13, { align: 'right' });
 
-        doc.setFontSize(12); // Total más grande
+        doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
-        doc.text(`TOTAL:`, rightAlignX - 30, finalY + 22, { align: 'right' });
+        doc.text(`TOTAL:`, totalLabelX, finalY + 22, { align: 'right' });
         doc.text(`$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, rightAlignX, finalY + 22, { align: 'right' });
         doc.setFont('helvetica', 'normal'); // Reset font style
 
