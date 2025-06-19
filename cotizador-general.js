@@ -123,19 +123,27 @@ function generarPDFGeneral() {
     const quoteNumber = generateQuoteNumber();
 
     // Promesas para cargar las imágenes (logo principal y marca de agua)
-    // Confirmado: el archivo esperado es logo_mtk.png
+    // ¡CORREGIDO: Usando 'logo_mtk.jpg' en lugar de 'logo_mtk.png'!
     const logoPromise = new Promise((resolve, reject) => {
         const img = new Image();
-        img.src = 'logo_mtk.png'; // Ruta de la imagen para el encabezado del PDF
+        img.crossOrigin = "Anonymous";
+        img.src = 'logo_mtk.jpg'; // <-- CAMBIO A .jpg
         img.onload = () => resolve(img);
-        img.onerror = () => reject('Error cargando logo_mtk.png');
+        img.onerror = (e) => {
+            console.error("Error al cargar mainLogo (logo_mtk.jpg):", e);
+            reject('Error cargando logo_mtk.jpg para el encabezado. Revisa consola y la extensión del archivo.');
+        };
     });
 
     const watermarkLogoPromise = new Promise((resolve, reject) => {
         const wmImg = new Image();
-        wmImg.src = 'logo_mtk.png'; // Ruta de la imagen para la marca de agua
+        wmImg.crossOrigin = "Anonymous";
+        wmImg.src = 'logo_mtk.jpg'; // <-- CAMBIO A .jpg
         wmImg.onload = () => resolve(wmImg);
-        wmImg.onerror = () => reject('Error cargando logo de marca de agua');
+        wmImg.onerror = (e) => {
+            console.error("Error al cargar watermarkImage (logo_mtk.jpg):", e);
+            reject('Error cargando logo_mtk.jpg para la marca de agua. Revisa consola y la extensión del archivo.');
+        };
     });
 
     // Esperar a que ambas imágenes se carguen antes de continuar
@@ -153,7 +161,7 @@ function generarPDFGeneral() {
             let companyInfoCurrentY = 15;
             const imgWidth = 40;
             const imgHeight = (mainLogo.naturalHeight / mainLogo.naturalWidth) * imgWidth;
-            doc.addImage(mainLogo, 'PNG', companyInfoStartX, companyInfoCurrentY, imgWidth, imgHeight);
+            doc.addImage(mainLogo, 'JPEG', companyInfoStartX, companyInfoCurrentY, imgWidth, imgHeight); // <-- CAMBIO A 'JPEG'
 
             companyInfoCurrentY = 15 + imgHeight + 5; // Posición de texto debajo del logo
             doc.setFontSize(10);
@@ -209,9 +217,8 @@ function generarPDFGeneral() {
             clientQuoteInfoCurrentY += 10; // Espacio después de datos del cliente
 
             // Sección de detalles de la cotización (Fechas y Número) - A la derecha, debajo de datos del cliente
-            // Usar rightAlignX para los valores numéricos y calcular la posición de las etiquetas
-            const rightAlignX = pageWidth - 15; // Margen derecho estándar (210 - 15 = 195)
-            const dateLabelOffset = 40; // Offset para etiquetas de fecha/cotización
+            const rightAlignX = pageWidth - 15;
+            const dateLabelOffset = 40;
 
             doc.setFontSize(10);
             doc.setFont('helvetica', 'normal');
@@ -225,9 +232,8 @@ function generarPDFGeneral() {
 
             doc.text(`Validez:`, rightAlignX - dateLabelOffset, clientQuoteInfoCurrentY, { align: 'right' });
             doc.text(expirationDateFormatted, rightAlignX, clientQuoteInfoCurrentY, { align: 'right' });
-            clientQuoteInfoCurrentY += 15; // Espacio final para bloque derecho
+            clientQuoteInfoCurrentY += 15;
             const clientQuoteInfoFinalY = clientQuoteInfoCurrentY;
-
 
             // --- PREPARACIÓN DE DATOS DE LA TABLA ---
             const tableData = [];
@@ -261,7 +267,7 @@ function generarPDFGeneral() {
             const watermarkY = (pageHeight - watermarkHeight) / 2;
 
             doc.autoTable({
-                startY: Math.max(companyInfoFinalY, clientQuoteInfoFinalY) + 10, // Asegura que la tabla empiece debajo de todo el encabezado
+                startY: Math.max(companyInfoFinalY, clientQuoteInfoFinalY) + 10,
                 head: [['CÓDIGO', 'DESCRIPCIÓN', 'UNIDAD', 'CANTIDAD', 'PRECIO UNIT.', 'TOTAL']],
                 body: tableData,
                 theme: 'striped',
@@ -271,7 +277,7 @@ function generarPDFGeneral() {
                     textColor: [0, 0, 0]
                 },
                 headStyles: {
-                    fillColor: [65, 126, 62], // Usar un verde similar al de tu paleta si quieres mantener consistencia con el PDF
+                    fillColor: [65, 126, 62],
                     textColor: 255,
                     fontStyle: 'bold'
                 },
@@ -279,17 +285,15 @@ function generarPDFGeneral() {
                     0: { cellWidth: 20 },
                     1: { cellWidth: 70 },
                     2: { cellWidth: 20, halign: 'center' },
-                    3: { cellWidth: 25, halign: 'center' }, // Ancho ajustado para "CANTIDAD"
+                    3: { cellWidth: 25, halign: 'center' },
                     4: { cellWidth: 30, halign: 'right' },
                     5: { cellWidth: 30, halign: 'right' }
                 },
                 didDrawPage: function (data) {
-                    // Dibujar la marca de agua en cada página
-                    doc.setGState(new doc.GState({ opacity: 0.1 })); // Opacidad baja para efecto de marca de agua
-                    doc.addImage(watermarkImage, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight); // Asumo PNG aquí
-                    doc.setGState(new doc.GState({ opacity: 1 })); // Restaurar opacidad
+                    doc.setGState(new doc.GState({ opacity: 0.1 }));
+                    doc.addImage(watermarkImage, 'JPEG', watermarkX, watermarkY, watermarkWidth, watermarkHeight); // <-- CAMBIO A 'JPEG'
+                    doc.setGState(new doc.GState({ opacity: 1 }));
 
-                    // Footer para páginas adicionales
                     if (data.pageNumber > 1) {
                         doc.setFontSize(8);
                         doc.text('Cotización - Página ' + data.pageNumber, data.settings.margin.left, doc.internal.pageSize.height - 10);
@@ -299,11 +303,7 @@ function generarPDFGeneral() {
 
             // Totales al final de la tabla
             const finalY = doc.autoTable.previous.finalY;
-            // Coordenada X para las etiquetas (Subtotal, IVA, TOTAL) - Alineado a la derecha de la columna PRECIO UNIT.
-            // Se calcula usando las propiedades de la tabla ya dibujada
             const totalLabelX = doc.autoTable.previous.columns[4].x + doc.autoTable.previous.columns[4].width;
-
-            // Coordenada X para los valores (Subtotal$, IVA$, TOTAL$) - Alineado a la derecha de la columna TOTAL
             const totalValueX = doc.autoTable.previous.columns[5].x + doc.autoTable.previous.columns[5].width;
 
             doc.setFontSize(10);
@@ -318,13 +318,13 @@ function generarPDFGeneral() {
             doc.setFont('helvetica', 'bold');
             doc.text(`TOTAL:`, totalLabelX, finalY + 22, { align: 'right' });
             doc.text(`$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 22, { align: 'right' });
-            doc.setFont('helvetica', 'normal'); // Reset font style
+            doc.setFont('helvetica', 'normal');
 
             doc.save(`Cotizacion_MTK_Servicios_${emissionDate.replace(/\//g, '-')}_${quoteNumber}.pdf`);
 
         }).catch(error => {
-            console.error("Error al cargar una imagen:", error);
-            alert("Error: No se pudo generar el PDF. Asegúrate de que 'logo_mtk.png' está en la misma carpeta que tus archivos HTML y JS, y que estás sirviendo la página a través de un servidor web.");
+            console.error("Error al cargar una imagen (promesa de logo):", error);
+            alert("Error: No se pudo generar el PDF porque no se pudo cargar el logo. Asegúrate de que 'logo_mtk.jpg' está en la misma carpeta que tus archivos y que no hay problemas de CORS.");
         });
 }
 
