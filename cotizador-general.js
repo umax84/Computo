@@ -96,6 +96,19 @@ function calculateTotals() {
     document.getElementById('totalDisplay').textContent = `$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
+// *** Función simplificada para cargar imágenes, como en tu script.js que funciona ***
+function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = (e) => {
+            console.error(`Error al cargar la imagen: ${src}`, e);
+            reject(`No se pudo cargar la imagen: ${src}. Asegúrate de que existe y la ruta es correcta.`);
+        };
+        img.src = src;
+    });
+}
+
 function generarPDFGeneral() {
     console.log("Intentando generar PDF...");
 
@@ -123,29 +136,9 @@ function generarPDFGeneral() {
 
     const quoteNumber = generateQuoteNumber();
 
-    // Promesas para cargar las imágenes (logo principal y marca de agua)
-    // *** CORRECCIÓN CLAVE: Usamos 'logo_mtk.png' y tipo 'PNG' ***
-    const logoPromise = new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "Anonymous"; // Importante para cargar imágenes de diferentes orígenes
-        img.src = 'logo_mtk.png'; // *** CAMBIO A .png ***
-        img.onload = () => resolve(img);
-        img.onerror = (e) => {
-            console.error("Error al cargar mainLogo (logo_mtk.png):", e);
-            reject('Error cargando logo_mtk.png para el encabezado. Revisa consola y la extensión del archivo.');
-        };
-    });
-
-    const watermarkLogoPromise = new Promise((resolve, reject) => {
-        const wmImg = new Image();
-        wmImg.crossOrigin = "Anonymous";
-        wmImg.src = 'logo_mtk.png'; // *** CAMBIO A .png ***
-        wmImg.onload = () => resolve(wmImg);
-        wmImg.onerror = (e) => {
-            console.error("Error al cargar watermarkImage (logo_mtk.png):", e);
-            reject('Error cargando logo_mtk.png para la marca de agua. Revisa consola y la extensión del archivo.');
-        };
-    });
+    // Cargar los logos usando la función simplificada
+    const logoPromise = loadImage('logo_mtk.png');
+    const watermarkLogoPromise = loadImage('logo_mtk.png'); // Ambos logos son el mismo archivo
 
     // Esperar a que ambas imágenes se carguen antes de continuar
     Promise.all([logoPromise, watermarkLogoPromise])
@@ -162,7 +155,7 @@ function generarPDFGeneral() {
             let companyInfoCurrentY = 15;
             const imgWidth = 40;
             const imgHeight = (mainLogo.naturalHeight / mainLogo.naturalWidth) * imgWidth;
-            doc.addImage(mainLogo, 'PNG', companyInfoStartX, companyInfoCurrentY, imgWidth, imgHeight); // *** CAMBIO A 'PNG' ***
+            doc.addImage(mainLogo, 'PNG', companyInfoStartX, companyInfoCurrentY, imgWidth, imgHeight);
 
             companyInfoCurrentY = 15 + imgHeight + 5; // Posición de texto debajo del logo
             doc.setFontSize(10);
@@ -300,7 +293,7 @@ function generarPDFGeneral() {
                 },
                 didDrawPage: function (data) {
                     doc.setGState(new doc.GState({ opacity: 0.1 }));
-                    doc.addImage(watermarkImage, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight); // *** CAMBIO A 'PNG' ***
+                    doc.addImage(watermarkImage, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
                     doc.setGState(new doc.GState({ opacity: 1 }));
 
                     if (data.pageNumber > 1) {
@@ -333,7 +326,8 @@ function generarPDFGeneral() {
 
         }).catch(error => {
             console.error("Error al cargar una imagen:", error);
-            alert("Error: No se pudo generar el PDF. Asegúrate de que 'logo_mtk.png' está en la misma carpeta que tus archivos y que no hay problemas de CORS.");
+            // El mensaje de error ahora es más específico si loadImage falla
+            alert("Error: No se pudo generar el PDF. " + error);
         });
 }
 
