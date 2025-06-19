@@ -16,14 +16,21 @@
     <h2>Generador de Cotizaciones Personalizadas</h2>
 
     <div class="form-section">
+        <h3>Datos del Cliente:</h3>
         <label for="clienteNombre">Nombre del Cliente:</label>
         <input type="text" id="clienteNombre" placeholder="Nombre completo del cliente">
 
         <label for="clienteEmpresa">Empresa (Opcional):</label>
         <input type="text" id="clienteEmpresa" placeholder="Nombre de la empresa">
 
-        <label for="cotizacionTitulo">Título de la Cotización:</label>
-        <input type="text" id="cotizacionTitulo" placeholder="Ej: Cotización Mantenimiento Redes" value="Cotización de Servicios">
+        <label for="clienteDireccion">Dirección del Cliente:</label>
+        <input type="text" id="clienteDireccion" placeholder="Dirección completa del cliente">
+
+        <label for="clienteTelefono">Teléfono del Cliente:</label>
+        <input type="text" id="clienteTelefono" placeholder="Teléfono del cliente">
+
+        <label for="clienteCorreo">Correo Electrónico del Cliente:</label>
+        <input type="email" id="clienteCorreo" placeholder="correo@ejemplo.com">
     </div>
 
     <h3>Detalles de los ítems:</h3>
@@ -31,7 +38,9 @@
         <table id="itemsTable">
           <thead>
             <tr>
+              <th>Código</th>
               <th>Descripción</th>
+              <th>Unidad</th>
               <th>Cantidad</th>
               <th>Precio Unitario (MXN)</th>
               <th>Total</th>
@@ -42,17 +51,17 @@
             </tbody>
           <tfoot>
             <tr>
-              <td colspan="3" style="text-align: right;">Subtotal:</td>
+              <td colspan="5" style="text-align: right;">Subtotal:</td>
               <td id="subtotalDisplay">$0.00</td>
               <td></td>
             </tr>
             <tr>
-              <td colspan="3" style="text-align: right;">IVA (16%):</td>
+              <td colspan="5" style="text-align: right;">IVA (16%):</td>
               <td id="ivaDisplay">$0.00</td>
               <td></td>
             </tr>
             <tr>
-              <td colspan="3" style="text-align: right; font-weight: bold;">Total:</td>
+              <td colspan="5" style="text-align: right; font-weight: bold;">Total:</td>
               <td id="totalDisplay" style="font-weight: bold;">$0.00</td>
               <td></td>
             </tr>
@@ -60,11 +69,6 @@
         </table>
     </div>
     <button onclick="addItem()">Agregar Ítem</button>
-
-    <div class="form-section">
-      <label for="observaciones">Observaciones adicionales (Opcional):</label>
-      <textarea id="observaciones" rows="4" placeholder="Ej: Tiempo de entrega, condiciones de pago, validez de la oferta, etc."></textarea>
-    </div>
 
     <button onclick="generarPDFGeneral()">Generar Cotización en PDF</button>
   </div>

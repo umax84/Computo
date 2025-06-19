@@ -1,19 +1,40 @@
 let itemCounter = 0; // Para dar un ID único a cada fila
 
+// Función para generar un número de cotización aleatorio (6 dígitos)
+function generateQuoteNumber() {
+    return Math.floor(100000 + Math.random() * 900000); // Genera un número entre 100000 y 999999
+}
+
 function addItem() {
     itemCounter++;
     const tableBody = document.querySelector('#itemsTable tbody');
     const newRow = tableBody.insertRow();
     newRow.id = `row-${itemCounter}`;
 
+    // Celda Código
+    const codeCell = newRow.insertCell();
+    const codeInput = document.createElement('input');
+    codeInput.type = 'text';
+    codeInput.placeholder = 'Código';
+    codeInput.className = 'item-code';
+    codeCell.appendChild(codeInput);
+
     // Celda Descripción
     const descCell = newRow.insertCell();
     const descInput = document.createElement('input');
     descInput.type = 'text';
-    descInput.placeholder = 'Descripción del servicio/producto';
+    descInput.placeholder = 'Descripción';
     descInput.className = 'item-desc';
-    descInput.oninput = calculateTotals;
+    descInput.oninput = calculateTotals; // Aunque no afecta el total, mantiene la consistencia
     descCell.appendChild(descInput);
+
+    // Celda Unidad
+    const unitCell = newRow.insertCell();
+    const unitInput = document.createElement('input');
+    unitInput.type = 'text';
+    unitInput.placeholder = 'Unidad';
+    unitInput.className = 'item-unit';
+    unitCell.appendChild(unitInput);
 
     // Celda Cantidad
     const qtyCell = newRow.insertCell();
@@ -76,7 +97,7 @@ function calculateTotals() {
 }
 
 function generarPDFGeneral() {
-    console.log("Intentando generar PDF..."); // Mensaje para depuración
+    console.log("Intentando generar PDF...");
 
     const { jsPDF } = window.jspdf;
     if (!jsPDF) {
@@ -86,54 +107,115 @@ function generarPDFGeneral() {
     }
     const doc = new jsPDF();
 
+    // Datos del Cliente
     const clienteNombre = document.getElementById('clienteNombre').value;
-    const clienteEmpresa = document.getElementById('clienteEmpresa').value;
-    const cotizacionTitulo = document.getElementById('cotizacionTitulo').value || 'Cotización de Servicios';
-    const observaciones = document.getElementById('observaciones').value;
+    const clienteEmpresa = document.getElementById('clienteEmpresa').value; // Usado solo para contexto, no en el PDF de muestra
+    const clienteDireccion = document.getElementById('clienteDireccion').value;
+    const clienteTelefono = document.getElementById('clienteTelefono').value;
+    const clienteCorreo = document.getElementById('clienteCorreo').value;
+
+    // Generar fechas y número de cotización
+    const today = new Date();
+    const emissionDate = today.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }); // Formato dd/mm/yyyy
+    const expirationDate = new Date(today);
+    expirationDate.setDate(today.getDate() + 7);
+    const expirationDateFormatted = expirationDate.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    const quoteNumber = generateQuoteNumber();
 
     const logo = new Image();
-    logo.src = 'logo_mtk.png'; // Asegúrate de que esta ruta sea correcta y la imagen esté en la misma carpeta
+    logo.src = 'logo_mtk.png';
 
-    logo.onload = function() { // Asegura que la imagen se cargue antes de añadirla al PDF
-        console.log("Logo cargado exitosamente. Continuando con la generación del PDF."); // Mensaje para depuración
-        const imgWidth = 40; // Ancho del logo
+    logo.onload = function() {
+        console.log("Logo cargado exitosamente. Continuando con la generación del PDF.");
+
+        const imgWidth = 40; // Ajusta según el tamaño del logo en el PDF de muestra
         const imgHeight = (logo.naturalHeight / logo.naturalWidth) * imgWidth;
-        doc.addImage(logo, 'PNG', 15, 10, imgWidth, imgHeight);
+        doc.addImage(logo, 'PNG', 15, 15, imgWidth, imgHeight); // Posición del logo (más hacia la izquierda y arriba)
 
-        doc.setFontSize(22);
-        doc.setTextColor(40);
-        doc.text('COTIZACIÓN DE SERVICIOS', 105, 20, { align: 'center' });
+        // Información de la empresa (texto superior izquierdo)
         doc.setFontSize(10);
-        doc.text('MTK SERVICIOS', 105, 26, { align: 'center' });
-        doc.text('San Nicolás de los Garza, Nuevo León, México', 105, 30, { align: 'center' });
-        doc.text('Fecha: ' + new Date().toLocaleDateString('es-MX'), 105, 34, { align: 'center' });
-        doc.text('Tel: 8138474143', 105, 38, { align: 'center' });
+        doc.setTextColor(0, 0, 0); // Negro
+        doc.setFont('helvetica', 'normal');
+        doc.text('MTK SERVICIOS S.A.S DE C.V.', 15, 15 + imgHeight + 5); // Debajo del logo
+        doc.text('Av. Los Pinos 731-A Los Ángeles 2da Sec,', 15, 15 + imgHeight + 10);
+        doc.text('San Nicolás de los Garza, Nuevo León', 15, 15 + imgHeight + 15);
+        doc.text('info@mtkservicios.com', 15, 15 + imgHeight + 20); // Email
+        doc.text('Teléfonos: 81 3847 4143', 15, 15 + imgHeight + 25); // Teléfono
 
+        // Título "COTIZACIÓN"
+        doc.setFontSize(28);
+        doc.setFont('helvetica', 'bold');
+        doc.text('COTIZACIÓN', 105, 30, { align: 'center' }); // Centrado
 
-        doc.setFontSize(12);
-        let yOffset = Math.max(10 + imgHeight + 10, 50);
-        doc.text(`Título: ${cotizacionTitulo}`, 15, yOffset);
-        yOffset += 7;
-        if (clienteNombre) {
-            doc.text(`Cliente: ${clienteNombre}`, 15, yOffset);
-            yOffset += 7;
-        }
-        if (clienteEmpresa) {
-            doc.text(`Empresa: ${clienteEmpresa}`, 15, yOffset);
-            yOffset += 7;
-        }
-        yOffset += 10;
+        // Sección de detalles de la cotización (fechas y número) - Alineado a la derecha
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        const rightAlignX = 195; // Margen derecho para alineación
+        let currentY = 50; // Posición inicial para esta sección
+
+        doc.text(`Fecha de emisión:`, rightAlignX - 40, currentY, { align: 'right' });
+        doc.text(emissionDate, rightAlignX, currentY, { align: 'right' });
+        currentY += 7;
+
+        doc.text(`Cotización N°:`, rightAlignX - 40, currentY, { align: 'right' });
+        doc.text(String(quoteNumber), rightAlignX, currentY, { align: 'right' });
+        currentY += 7;
+
+        doc.text(`Validez:`, rightAlignX - 40, currentY, { align: 'right' });
+        doc.text(expirationDateFormatted, rightAlignX, currentY, { align: 'right' });
+        currentY += 15; // Espacio después de esta sección
+
+        // Sección de datos del cliente - Alineado a la izquierda
+        let clientY = currentY; // Usar la Y actual
+        const leftAlignX = 15; // Margen izquierdo para alineación
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Cliente:', leftAlignX, clientY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(clienteNombre || 'N/A', leftAlignX + 25, clientY); // Ajusta X para alinear el valor
+        clientY += 7;
+
+        doc.setFont('helvetica', 'bold');
+        doc.text('C.I.F/DNI:', leftAlignX, clientY); // Campo vacío en la muestra
+        doc.setFont('helvetica', 'normal');
+        doc.text('', leftAlignX + 25, clientY);
+        clientY += 7;
+
+        doc.setFont('helvetica', 'bold');
+        doc.text('Dirección:', leftAlignX, clientY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(clienteDireccion || 'N/A', leftAlignX + 25, clientY);
+        clientY += 7;
+
+        doc.setFont('helvetica', 'bold');
+        doc.text('Teléfonos:', leftAlignX, clientY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(clienteTelefono || 'N/A', leftAlignX + 25, clientY);
+        clientY += 7;
+
+        doc.setFont('helvetica', 'bold');
+        doc.text('Correo elect.:', leftAlignX, clientY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(clienteCorreo || 'N/A', leftAlignX + 25, clientY);
+        clientY += 15; // Espacio antes de la tabla
+
 
         const tableData = [];
         const rows = document.querySelectorAll('#itemsTable tbody tr');
 
         rows.forEach(row => {
+            const code = row.querySelector('.item-code').value;
             const desc = row.querySelector('.item-desc').value;
+            const unit = row.querySelector('.item-unit').value;
             const qty = parseFloat(row.querySelector('.item-qty').value);
             const price = parseFloat(row.querySelector('.item-price').value);
             const itemTotal = isNaN(qty) || isNaN(price) ? 0 : qty * price;
             tableData.push([
+                code || 'N/A',
                 desc || 'N/A',
+                unit || 'N/A',
                 qty.toString(),
                 `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
                 `$${itemTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -144,28 +226,31 @@ function generarPDFGeneral() {
         const iva = parseFloat(document.getElementById('ivaDisplay').textContent.replace('$', '').replace(/,/g, ''));
         const total = parseFloat(document.getElementById('totalDisplay').textContent.replace('$', '').replace(/,/g, ''));
 
-
         doc.autoTable({
-            startY: yOffset,
-            head: [['Descripción', 'Cantidad', 'Precio Unitario', 'Total']],
+            startY: clientY,
+            head: [['CÓDIGO', 'DESCRIPCIÓN', 'UNIDAD', 'CANTIDAD', 'PRECIO UNIT.', 'TOTAL']],
             body: tableData,
             theme: 'striped',
             styles: {
-                fontSize: 10,
-                cellPadding: 3,
+                fontSize: 9, // Un poco más pequeña para encajar
+                cellPadding: 2,
+                textColor: [0, 0, 0] // Texto negro
             },
             headStyles: {
-                fillColor: [65, 126, 62],
-                textColor: 255,
+                fillColor: [65, 126, 62], // Verde oscuro de MTK
+                textColor: 255, // Texto blanco
                 fontStyle: 'bold'
             },
             columnStyles: {
-                0: { cellWidth: 80 },
-                1: { cellWidth: 20, halign: 'center' },
-                2: { cellWidth: 40, halign: 'right' },
-                3: { cellWidth: 40, halign: 'right' }
+                0: { cellWidth: 20 }, // Código
+                1: { cellWidth: 70 }, // Descripción (más ancha)
+                2: { cellWidth: 20, halign: 'center' }, // Unidad
+                3: { cellWidth: 20, halign: 'center' }, // Cantidad
+                4: { cellWidth: 30, halign: 'right' }, // Precio Unitario
+                5: { cellWidth: 30, halign: 'right' }  // Total
             },
             didDrawPage: function (data) {
+                // Footer para páginas adicionales
                 if (data.pageNumber > 1) {
                     doc.setFontSize(8);
                     doc.text('Cotización - Página ' + data.pageNumber, data.settings.margin.left, doc.internal.pageSize.height - 10);
@@ -173,29 +258,28 @@ function generarPDFGeneral() {
             }
         });
 
+        // Totales al final de la tabla
         const finalY = doc.autoTable.previous.finalY;
 
-        doc.setFontSize(12);
-        doc.text(`Subtotal: $${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 195, finalY + 10, { align: 'right' });
-        doc.text(`IVA (16%): $${iva.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 195, finalY + 17, { align: 'right' });
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`TOTAL: $${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 195, finalY + 28, { align: 'right' });
+        doc.setFontSize(10); // Menos tamaño que antes para que encaje mejor
         doc.setFont('helvetica', 'normal');
+        doc.text(`Subtotal:`, rightAlignX - 30, finalY + 7, { align: 'right' });
+        doc.text(`$${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, rightAlignX, finalY + 7, { align: 'right' });
 
-        if (observaciones) {
-            doc.setFontSize(10);
-            doc.text('Observaciones:', 15, finalY + 40);
-            doc.setFontSize(9);
-            const splitText = doc.splitTextToSize(observaciones, doc.internal.pageSize.width - 30);
-            doc.text(splitText, 15, finalY + 45);
-        }
-        console.log("PDF listo para guardar."); // Mensaje para depuración
-        doc.save(`Cotizacion_MTK_Servicios_${new Date().toLocaleDateString('es-MX').replace(/\//g, '-')}.pdf`);
+        doc.text(`IVA (16%):`, rightAlignX - 30, finalY + 13, { align: 'right' });
+        doc.text(`$${iva.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, rightAlignX, finalY + 13, { align: 'right' });
+
+        doc.setFontSize(12); // Total más grande
+        doc.setFont('helvetica', 'bold');
+        doc.text(`TOTAL:`, rightAlignX - 30, finalY + 22, { align: 'right' });
+        doc.text(`$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, rightAlignX, finalY + 22, { align: 'right' });
+        doc.setFont('helvetica', 'normal'); // Reset font style
+
+        doc.save(`Cotizacion_MTK_Servicios_${emissionDate.replace(/\//g, '-')}_${quoteNumber}.pdf`);
     };
 
     logo.onerror = function() {
-        console.error('ERROR: No se pudo cargar la imagen del logo. Asegúrate de que "logo_mtk.png" existe en la misma carpeta que tu archivo HTML y JavaScript.');
+        console.error('ERROR: No se pudo cargar la imagen del logo para el PDF. Asegúrate de que "logo_mtk.png" existe en la misma carpeta que tu archivo HTML y JavaScript y que lo estás sirviendo a través de un servidor web local (ej. Python http.server o Live Server de VS Code).');
         alert('Error: No se pudo generar el PDF. Hubo un problema con la imagen del logo. Revisa la consola del navegador (F12) para más detalles.');
     };
 
