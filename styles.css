@@ -1,350 +1,297 @@
 /* Colores de la paleta (inspirados en el logo) */
 :root {
-    --primary-dark: #1F1F1F; /* Fondo principal */
-    --secondary-green: #3D5537; /* Fondo de contenedores, elementos clave */
-    --accent-gold: #A37F2C; /* Acentos, botones, títulos */
-    --light-text: #E0E0E0; /* Texto general claro */
-    --highlight-green: #C2F094; /* Texto de resultados, énfasis */
-    --table-header-bg: #4F6A4F; /* Fondo de cabecera de tabla */
-    --table-border: #6B8E6B; /* Borde de tabla y inputs */
-    --button-hover: #8C6F26; /* Hover de botón */
-    --delete-button-bg: #D9534F; /* Botón de eliminar */
-    --delete-button-hover: #C9302C; /* Hover de botón de eliminar */
+    --primary-dark: #1b1b1b; /* Fondo principal */
+    --secondary-green: #2e4d2c; /* Fondo de contenedores, elementos clave */
+    --accent-green-light: #4CAF50; /* Acentos, botones, títulos */
+    --text-light: #e0ffe0; /* Texto general claro */
+    --border-light-green: #88ff88; /* Borde de inputs */
+    --button-hover: #45a049; /* Hover de botón */
+    --delete-button-bg: #d9534f; /* Botón de eliminar */
+    --delete-button-hover: #c9302c; /* Hover de botón de eliminar */
+    --table-header-bg: #3a5a3a; /* Fondo de cabecera de tabla */
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--primary-dark);
-    color: var(--light-text);
+    font-family: Arial, sans-serif;
+    background: var(--primary-dark);
+    color: var(--text-light);
     padding: 0;
     margin: 0;
     line-height: 1.6;
-    min-height: 100vh; /* Asegura que el body ocupe al menos toda la altura de la ventana */
-    display: flex;
-    flex-direction: column;
-}
-
-/* Header */
-.header {
-    background-color: var(--secondary-green);
-    color: white;
-    padding: 20px;
-    text-align: center;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    justify-content: flex-start; /* Alinea al inicio para que el contenido fluya hacia abajo */
+    padding-bottom: 30px; /* Espacio al final */
 }
 
-.header-logo {
-    max-width: 100px; /* Ajusta según el tamaño de tu logo */
-    height: auto;
-    border-radius: 50%; /* Si es un logo circular */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.header-text h1 {
-    margin: 0;
-    font-size: 2.2em;
-    color: var(--accent-gold);
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-.header-text p {
-    margin: 5px 0 0;
-    font-size: 1.1em;
-    color: var(--highlight-green);
-}
-
-/* Main Container */
-.main-container {
-    padding: 20px;
-    display: flex;
-    justify-content: center; /* Centra el contenido en pantallas grandes */
-    flex-grow: 1; /* Permite que el contenedor principal ocupe el espacio restante */
-}
-
-.cotizador-section {
+.header {
     background-color: var(--secondary-green);
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-    max-width: 900px; /* Ancho máximo para la sección de cotizador */
-    width: 100%; /* Asegura que ocupe el ancho disponible */
-    box-sizing: border-box;
+    color: var(--text-light);
+    padding: 15px 20px;
+    text-align: center;
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Permite que el contenido se ajuste en pantallas pequeñas */
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.8em;
+    flex-grow: 1; /* Permite que el título ocupe espacio */
+    text-align: left; /* Alinea el título a la izquierda */
+}
+
+.header-logo-right {
+    max-width: 80px; /* Tamaño del logo */
+    height: auto;
+    margin-left: 20px; /* Espacio entre el título y el logo */
+}
+
+.calculator.general-cotizador-container {
+    max-width: 900px; /* Más ancho para la tabla de ítems */
+    width: 95%; /* Responsive */
+    margin: 20px auto;
+    background: var(--secondary-green);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
 }
 
 h2, h3 {
-    color: var(--accent-gold);
     text-align: center;
-    margin-bottom: 25px;
-    border-bottom: 2px solid var(--accent-gold);
-    padding-bottom: 10px;
+    color: var(--accent-green-light);
+    margin-bottom: 20px;
 }
 
-/* Form Grid for Client Data */
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas por defecto */
-    gap: 20px;
+label {
+    display: block;
+    width: 100%;
+    margin-bottom: 8px;
+    color: var(--text-light);
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+    display: block;
+    width: calc(100% - 22px); /* Ancho completo menos padding y borde */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-light-green);
+    border-radius: 8px;
+    background-color: #3a5a3a; /* Un tono más oscuro de verde para inputs */
+    color: var(--text-light);
+    box-sizing: border-box; /* Incluye padding y borde en el ancho */
+}
+
+input::placeholder, textarea::placeholder {
+    color: rgba(224, 255, 224, 0.7);
+}
+
+button {
+    padding: 12px 20px;
+    background-color: var(--accent-green-light);
+    color: white;
+    font-size: 1em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--button-hover);
+}
+
+/* Estilos específicos para el cotizador general */
+.form-section {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid var(--border-light-green);
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.1); /* Ligero fondo para la sección de formulario */
+}
+
+.items-section {
     margin-bottom: 30px;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: var(--highlight-green);
-    font-size: 0.95em;
-}
-
-.form-group input[type="text"],
-.form-group input[type="tel"],
-.form-group input[type="email"],
-.form-group input[type="number"] { /* Asegurarse de que los inputs de número también tengan estilo */
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--table-border); /* Borde suave */
-    border-radius: 6px;
-    background-color: var(--primary-dark); /* Fondo oscuro para los inputs */
-    color: var(--light-text);
-    font-size: 1em;
-    box-sizing: border-box; /* Incluye padding en el ancho */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form-group input:focus {
-    border-color: var(--accent-gold);
-    outline: none;
-    box-shadow: 0 0 8px rgba(163, 127, 44, 0.5);
-}
-
-/* Table styles */
 .table-container {
-    overflow-x: auto; /* Permite scroll horizontal en pantallas pequeñas */
+    overflow-x: auto; /* Permite scroll horizontal en tablas en móviles */
     margin-bottom: 20px;
-    width: 100%; /* Asegura que el contenedor de la tabla ocupe todo el ancho disponible */
 }
 
 #itemsTable {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
-    font-size: 0.9em;
-    min-width: 650px; /* Mínimo ancho para la tabla para evitar que se comprima demasiado */
 }
 
-#itemsTable th,
-#itemsTable td {
-    border: 1px solid var(--table-border);
-    padding: 10px;
+#itemsTable th, #itemsTable td {
+    border: 1px solid var(--border-light-green);
+    padding: 8px;
     text-align: left;
-    color: var(--light-text);
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
 }
 
 #itemsTable th {
     background-color: var(--table-header-bg);
-    color: white;
+    color: var(--text-light);
     font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.9em;
     text-align: center;
 }
-#itemsTable th:first-child, #itemsTable td:first-child { text-align: left; }
-#itemsTable th:nth-child(4), #itemsTable td:nth-child(4) { text-align: center; } /* Cantidad */
-#itemsTable th:nth-child(5), #itemsTable td:nth-child(5), /* Precio Unitario */
-#itemsTable th:nth-child(6), #itemsTable td:nth-child(6) { /* Total */
-    text-align: right;
+
+#itemsTable tbody tr:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.05); /* Ligeras franjas para filas impares */
 }
 
-/* Input styles within table */
-#itemsTable input[type="text"],
-#itemsTable input[type="number"] {
-    width: calc(100% - 2px); /* Ajuste para bordes */
-    padding: 8px;
-    border: 1px solid var(--table-border);
-    border-radius: 4px;
-    background-color: var(--primary-dark);
-    color: var(--light-text);
+#itemsTable input {
+    width: calc(100% - 16px); /* Ajuste para inputs dentro de la tabla */
+    padding: 5px;
+    margin: 0;
     font-size: 0.9em;
-    box-sizing: border-box;
-    margin: 0; /* Elimina margen extra */
 }
 
-#itemsTable .delete-item-button {
+#itemsTable .item-row-total, #itemsTable tfoot td {
+    text-align: right; /* Alinea los totales a la derecha */
+}
+
+.delete-item-button {
     background-color: var(--delete-button-bg);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 10px;
-    cursor: pointer;
-    font-size: 0.85em;
-    width: auto; /* Ajusta el ancho al contenido */
+    padding: 5px 10px;
+    width: auto;
+    margin: 0 auto; /* Centra el botón en la celda */
     display: block;
-    margin: 0 auto; /* Centra el botón si la celda es más ancha */
-    white-space: nowrap; /* Evita que el texto del botón se rompa */
+    font-size: 0.9em;
 }
 
-#itemsTable .delete-item-button:hover {
+.delete-item-button:hover {
     background-color: var(--delete-button-hover);
 }
 
-/* Buttons */
-.add-item-button, .generate-pdf-button {
-    padding: 12px 25px;
-    background-color: var(--accent-gold);
-    color: var(--primary-dark);
-    font-size: 1.1em;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 20px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.add-item-button:hover, .generate-pdf-button:hover {
-    background-color: var(--button-hover);
-    transform: translateY(-2px);
+.add-item-button {
+    background-color: var(--accent-green-light);
+    margin-top: 10px;
 }
 
 .generate-pdf-button {
-    margin-top: 30px; /* Más espacio para el botón final */
-    background-color: var(--highlight-green); /* Un color que lo haga resaltar para la acción final */
-    color: var(--secondary-green);
-}
-.generate-pdf-button:hover {
-    background-color: #A3D47C; /* Un hover más claro para el botón final */
+    background-color: var(--accent-green-light);
+    margin-top: 30px;
+    font-size: 1.1em;
+    padding: 15px 20px;
 }
 
-/* Totals Section */
-.totals-section {
-    text-align: right;
+.cta {
+    background-color: var(--table-header-bg); /* Un color de fondo para la CTA */
+    color: var(--text-light);
+    padding: 20px;
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
     margin-top: 30px;
-    padding-top: 15px;
-    border-top: 1px solid var(--table-border);
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.cta p {
+    margin-bottom: 15px;
     font-size: 1.1em;
 }
 
-.totals-section p {
-    margin: 8px 0;
-}
-
-.totals-section .total-final {
-    font-size: 1.6em;
+.whatsapp-button {
+    display: inline-block;
+    background-color: #25D366; /* Color de WhatsApp */
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
     font-weight: bold;
-    color: var(--accent-gold);
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
 }
 
-
-/* Responsive Design */
-@media screen and (max-width: 768px) {
-    .header-text h1 {
-        font-size: 1.8em;
-    }
-    .header-text p {
-        font-size: 1em;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr; /* Una columna en tablets y móviles */
-    }
-
-    .cotizador-section {
-        padding: 20px;
-    }
-
-    /* Tabla: permitir scroll y ajustar padding */
-    #itemsTable th,
-    #itemsTable td {
-        padding: 8px;
-    }
-
-    #itemsTable input[type="text"],
-    #itemsTable input[type="number"] {
-        padding: 6px;
-        font-size: 0.85em;
-    }
-
-    .add-item-button, .generate-pdf-button {
-        font-size: 1em;
-        padding: 10px 20px;
-    }
-
-    .totals-section {
-        font-size: 1em;
-    }
-
-    .totals-section .total-final {
-        font-size: 1.4em;
-    }
+.whatsapp-button:hover {
+    background-color: #1DA851;
 }
 
-@media screen and (max-width: 480px) {
-    .header {
-        padding: 15px;
-    }
-    .header-logo {
-        max-width: 80px;
-    }
-    .header-text h1 {
+/* Media Queries para Responsiveness */
+@media (max-width: 768px) {
+    .header h1 {
         font-size: 1.5em;
-    }
-    .header-text p {
-        font-size: 0.9em;
-    }
-
-    .main-container {
-        padding: 10px;
+        text-align: center;
+        width: 100%;
     }
 
-    .cotizador-section {
+    .header-logo-right {
+        margin: 10px auto 0; /* Centra el logo debajo del título en móvil */
+    }
+
+    .calculator.general-cotizador-container {
         padding: 15px;
     }
 
     h2, h3 {
-        font-size: 1.3em;
-        margin-bottom: 15px;
+        font-size: 1.4em;
     }
 
-    .form-group label {
-        font-size: 0.9em;
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    select,
+    textarea {
+        width: calc(100% - 20px); /* Ajuste para pantallas más pequeñas */
+        padding: 8px;
     }
-    .form-group input {
-        padding: 10px;
+
+    #itemsTable th, #itemsTable td {
+        padding: 6px;
         font-size: 0.9em;
     }
 
-    /* Tabla más compacta en móviles */
-    #itemsTable {
+    #itemsTable input {
+        padding: 4px;
+        font-size: 0.85em;
+    }
+
+    .delete-item-button {
+        padding: 3px 6px;
         font-size: 0.8em;
     }
-    #itemsTable th,
-    #itemsTable td {
-        padding: 6px;
-    }
-    #itemsTable .delete-item-button {
-        padding: 4px 8px;
-        font-size: 0.75em;
-    }
 
-    .add-item-button, .generate-pdf-button {
+    button {
         font-size: 0.95em;
         padding: 10px 15px;
     }
+}
 
-    .totals-section {
-        font-size: 0.95em;
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.3em;
     }
-    .totals-section .total-final {
+
+    .header-logo-right {
+        max-width: 60px;
+    }
+
+    .calculator.general-cotizador-container {
+        padding: 10px;
+    }
+
+    h2, h3 {
         font-size: 1.2em;
     }
+
+    /* La tabla se hará scrollable horizontalmente por overflow-x: auto */
 }
