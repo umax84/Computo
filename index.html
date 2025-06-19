@@ -3,83 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cotizador General de Servicios - MTK</title>
+  <title>Cotizador General MTK Servicios</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
-  <header class="header general-header">
-    <h1 class="header-title-general">Cotizador de Servicios MTK</h1>
-    <img src="logo_mtk.png" alt="Logo MTK" class="logo-right">
+  <header class="header">
+    <img src="logo_mtk.png" alt="MTK Servicios Logo" class="header-logo">
+    <div class="header-text">
+      <h1>MTK SERVICIOS</h1>
+      <p>Generador de Cotizaciones Personalizadas</p>
+    </div>
   </header>
 
-  <div class="calculator">
-    <h2>Generador de Cotizaciones Personalizadas</h2>
+  <div class="main-container">
+    <div class="cotizador-section">
+      <h2>Datos de la Cotización</h2>
 
-    <div class="form-section">
-        <h3>Datos del Cliente:</h3>
-        <label for="clienteNombre">Nombre del Cliente:</label>
-        <input type="text" id="clienteNombre" placeholder="Nombre completo del cliente">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="clienteNombre">Nombre del Cliente:</label>
+          <input type="text" id="clienteNombre" placeholder="Nombre Completo" />
+        </div>
 
-        <label for="clienteEmpresa">Empresa (Opcional):</label>
-        <input type="text" id="clienteEmpresa" placeholder="Nombre de la empresa">
+        <div class="form-group">
+          <label for="clienteDireccion">Dirección del Cliente:</label>
+          <input type="text" id="clienteDireccion" placeholder="Dirección Completa" />
+        </div>
 
-        <label for="clienteDireccion">Dirección del Cliente:</label>
-        <input type="text" id="clienteDireccion" placeholder="Dirección completa del cliente">
+        <div class="form-group">
+          <label for="clienteTelefono">Teléfono del Cliente:</label>
+          <input type="tel" id="clienteTelefono" placeholder="Ej. 8112345678" />
+        </div>
 
-        <label for="clienteTelefono">Teléfono del Cliente:</label>
-        <input type="text" id="clienteTelefono" placeholder="Teléfono del cliente">
+        <div class="form-group">
+          <label for="clienteCorreo">Correo del Cliente:</label>
+          <input type="email" id="clienteCorreo" placeholder="correo@ejemplo.com" />
+        </div>
+      </div>
 
-        <label for="clienteCorreo">Correo Electrónico del Cliente:</label>
-        <input type="email" id="clienteCorreo" placeholder="correo@ejemplo.com">
-    </div>
-
-    <h3>Detalles de los ítems:</h3>
-    <div class="table-responsive">
+      <h3>Detalles de los Ítems</h3>
+      <div class="table-container">
         <table id="itemsTable">
           <thead>
             <tr>
-              <th>Código</th>
-              <th>Descripción</th>
-              <th>Unidad</th>
-              <th>Cantidad</th>
-              <th>Precio Unitario (MXN)</th>
-              <th>Total</th>
+              <th>CÓDIGO</th>
+              <th>DESCRIPCIÓN</th>
+              <th>UNIDAD</th>
+              <th>CANTIDAD</th>
+              <th>PRECIO UNIT.</th>
+              <th>TOTAL</th>
               <th>Acción</th>
             </tr>
           </thead>
           <tbody>
             </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="5" style="text-align: right;">Subtotal:</td>
-              <td id="subtotalDisplay">$0.00</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td colspan="5" style="text-align: right;">IVA (16%):</td>
-              <td id="ivaDisplay">$0.00</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td colspan="5" style="text-align: right; font-weight: bold;">Total:</td>
-              <td id="totalDisplay" style="font-weight: bold;">$0.00</td>
-              <td></td>
-            </tr>
-          </tfoot>
         </table>
+      </div>
+      <button type="button" onclick="addItem()" class="add-item-button">Agregar Ítem</button>
+
+      <div class="totals-section">
+        <p>Subtotal: <span id="subtotalDisplay">$0.00</span></p>
+        <p>IVA (16%): <span id="ivaDisplay">$0.00</span></p>
+        <p class="total-final">Total: <span id="totalDisplay">$0.00</span></p>
+      </div>
+
+      <button type="button" onclick="generarPDFGeneral()" class="generate-pdf-button">Generar Cotización en PDF</button>
     </div>
-    <button onclick="addItem()">Agregar Ítem</button>
-
-    <button onclick="generarPDFGeneral()">Generar Cotización en PDF</button>
   </div>
 
-  <div class="cta">
-    <p>¿Tienes dudas o necesitas otra cotización?</p>
-    <a href="https://w.app/mtk2025" target="_blank" class="whatsapp-button">Contáctanos por WhatsApp</a>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <script src="cotizador-general.js"></script>
+
 </body>
 </html>

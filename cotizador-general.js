@@ -123,16 +123,17 @@ function generarPDFGeneral() {
     const quoteNumber = generateQuoteNumber();
 
     // Promesas para cargar las imágenes (logo principal y marca de agua)
+    // Usaremos logo_mtk.png como referencia. Si usas .jpg, asegúrate de cambiar la extensión aquí.
     const logoPromise = new Promise((resolve, reject) => {
         const img = new Image();
-        img.src = 'logo_mtk.png';
+        img.src = 'logo_mtk.png'; // Usar .png como referencia
         img.onload = () => resolve(img);
         img.onerror = () => reject('Error cargando logo_mtk.png');
     });
 
     const watermarkLogoPromise = new Promise((resolve, reject) => {
         const wmImg = new Image();
-        wmImg.src = 'logo_mtk.png';
+        wmImg.src = 'logo_mtk.png'; // Usar .png como referencia
         wmImg.onload = () => resolve(wmImg);
         wmImg.onerror = () => reject('Error cargando logo de marca de agua');
     });
@@ -250,8 +251,8 @@ function generarPDFGeneral() {
             });
 
             const subtotal = parseFloat(document.getElementById('subtotalDisplay').textContent.replace('$', '').replace(/,/g, ''));
-            const iva = parseFloat(document.getElementById('ivaDisplay').textContent.replace('$', '').replace(/,/g, ''));
-            const total = parseFloat(document.getElementById('totalDisplay').textContent.replace('$', '').replace(/,/g, ''));
+            const iva = subtotal * 0.16;
+            const total = subtotal + iva;
 
             // --- GENERACIÓN DE LA TABLA Y MARCA DE AGUA ---
             const watermarkWidth = 120;
@@ -270,7 +271,7 @@ function generarPDFGeneral() {
                     textColor: [0, 0, 0]
                 },
                 headStyles: {
-                    fillColor: [65, 126, 62],
+                    fillColor: [65, 126, 62], // Usar un verde similar al de tu paleta si quieres mantener consistencia con el PDF
                     textColor: 255,
                     fontStyle: 'bold'
                 },
@@ -285,7 +286,7 @@ function generarPDFGeneral() {
                 didDrawPage: function (data) {
                     // Dibujar la marca de agua en cada página
                     doc.setGState(new doc.GState({ opacity: 0.1 })); // Opacidad baja para efecto de marca de agua
-                    doc.addImage(watermarkImage, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+                    doc.addImage(watermarkImage, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight); // Asumo PNG aquí
                     doc.setGState(new doc.GState({ opacity: 1 })); // Restaurar opacidad
 
                     // Footer para páginas adicionales
@@ -308,7 +309,6 @@ function generarPDFGeneral() {
             doc.setFontSize(10);
             doc.setFont('helvetica', 'normal');
             doc.text(`Subtotal:`, totalLabelX, finalY + 7, { align: 'right' });
-            doc.text(`$${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             doc.text(`$${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, totalValueX, finalY + 7, { align: 'right' });
 
             doc.text(`IVA (16%):`, totalLabelX, finalY + 13, { align: 'right' });
