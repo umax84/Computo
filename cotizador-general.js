@@ -109,6 +109,7 @@ function generarPDFGeneral() {
 
     // Datos del Cliente
     const clienteNombre = document.getElementById('clienteNombre').value;
+    const clienteEmpresa = document.getElementById('clienteEmpresa').value;
     const clienteDireccion = document.getElementById('clienteDireccion').value;
     const clienteTelefono = document.getElementById('clienteTelefono').value;
     const clienteCorreo = document.getElementById('clienteCorreo').value;
@@ -123,26 +124,26 @@ function generarPDFGeneral() {
     const quoteNumber = generateQuoteNumber();
 
     // Promesas para cargar las imágenes (logo principal y marca de agua)
-    // ¡CORREGIDO: Usando 'logo_mtk.jpg' en lugar de 'logo_mtk.png'!
+    // *** CORRECCIÓN CLAVE: Usamos 'logo_mtk.png' y tipo 'PNG' ***
     const logoPromise = new Promise((resolve, reject) => {
         const img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.src = 'logo_mtk.jpg'; // <-- CAMBIO A .jpg
+        img.crossOrigin = "Anonymous"; // Importante para cargar imágenes de diferentes orígenes
+        img.src = 'logo_mtk.png'; // *** CAMBIO A .png ***
         img.onload = () => resolve(img);
         img.onerror = (e) => {
-            console.error("Error al cargar mainLogo (logo_mtk.jpg):", e);
-            reject('Error cargando logo_mtk.jpg para el encabezado. Revisa consola y la extensión del archivo.');
+            console.error("Error al cargar mainLogo (logo_mtk.png):", e);
+            reject('Error cargando logo_mtk.png para el encabezado. Revisa consola y la extensión del archivo.');
         };
     });
 
     const watermarkLogoPromise = new Promise((resolve, reject) => {
         const wmImg = new Image();
         wmImg.crossOrigin = "Anonymous";
-        wmImg.src = 'logo_mtk.jpg'; // <-- CAMBIO A .jpg
+        wmImg.src = 'logo_mtk.png'; // *** CAMBIO A .png ***
         wmImg.onload = () => resolve(wmImg);
         wmImg.onerror = (e) => {
-            console.error("Error al cargar watermarkImage (logo_mtk.jpg):", e);
-            reject('Error cargando logo_mtk.jpg para la marca de agua. Revisa consola y la extensión del archivo.');
+            console.error("Error al cargar watermarkImage (logo_mtk.png):", e);
+            reject('Error cargando logo_mtk.png para la marca de agua. Revisa consola y la extensión del archivo.');
         };
     });
 
@@ -161,7 +162,7 @@ function generarPDFGeneral() {
             let companyInfoCurrentY = 15;
             const imgWidth = 40;
             const imgHeight = (mainLogo.naturalHeight / mainLogo.naturalWidth) * imgWidth;
-            doc.addImage(mainLogo, 'JPEG', companyInfoStartX, companyInfoCurrentY, imgWidth, imgHeight); // <-- CAMBIO A 'JPEG'
+            doc.addImage(mainLogo, 'PNG', companyInfoStartX, companyInfoCurrentY, imgWidth, imgHeight); // *** CAMBIO A 'PNG' ***
 
             companyInfoCurrentY = 15 + imgHeight + 5; // Posición de texto debajo del logo
             doc.setFontSize(10);
@@ -197,6 +198,14 @@ function generarPDFGeneral() {
             doc.setFont('helvetica', 'normal');
             doc.text(clienteNombre || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
             clientQuoteInfoCurrentY += rightColLineSpacing;
+
+            if (clienteEmpresa) { // Mostrar empresa solo si se ingresa
+                doc.setFont('helvetica', 'bold');
+                doc.text('Empresa:', rightColStartX, clientQuoteInfoCurrentY);
+                doc.setFont('helvetica', 'normal');
+                doc.text(clienteEmpresa || '', rightColStartX + rightColLabelOffset, clientQuoteInfoCurrentY);
+                clientQuoteInfoCurrentY += rightColLineSpacing;
+            }
 
             doc.setFont('helvetica', 'bold');
             doc.text('Dirección:', rightColStartX, clientQuoteInfoCurrentY);
@@ -291,7 +300,7 @@ function generarPDFGeneral() {
                 },
                 didDrawPage: function (data) {
                     doc.setGState(new doc.GState({ opacity: 0.1 }));
-                    doc.addImage(watermarkImage, 'JPEG', watermarkX, watermarkY, watermarkWidth, watermarkHeight); // <-- CAMBIO A 'JPEG'
+                    doc.addImage(watermarkImage, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight); // *** CAMBIO A 'PNG' ***
                     doc.setGState(new doc.GState({ opacity: 1 }));
 
                     if (data.pageNumber > 1) {
@@ -323,10 +332,9 @@ function generarPDFGeneral() {
             doc.save(`Cotizacion_MTK_Servicios_${emissionDate.replace(/\//g, '-')}_${quoteNumber}.pdf`);
 
         }).catch(error => {
-            console.error("Error al cargar una imagen (promesa de logo):", error);
-            alert("Error: No se pudo generar el PDF porque no se pudo cargar el logo. Asegúrate de que 'logo_mtk.jpg' está en la misma carpeta que tus archivos y que no hay problemas de CORS.");
+            console.error("Error al cargar una imagen:", error);
+            alert("Error: No se pudo generar el PDF. Asegúrate de que 'logo_mtk.png' está en la misma carpeta que tus archivos y que no hay problemas de CORS.");
         });
 }
 
-// Añadir un ítem inicial al cargar la página
 document.addEventListener('DOMContentLoaded', addItem);
